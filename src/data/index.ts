@@ -1,31 +1,40 @@
 import { Activity } from '../types';
 import { sampleActivities } from './sampleActivities';
 
-// Agent-generated partial batch (practical-life PL001-PL050)
-let part1Activities: Activity[] = [];
+// Generated batch: practical-life PL051–PL100
+let part2Activities: Activity[] = [];
 try {
-  const mod = require('../activities_part1');
-  part1Activities = (mod.part1 ?? []) as Activity[];
+  const mod = require('../activities_part2');
+  part2Activities = (mod.part2 ?? []) as Activity[];
 } catch {
   // not yet present
 }
 
-// Batch 1 (practical-life, sensorial, language, mathematics) — generated activities
+// Generated batch: practical-life PL101–PL150
+let part3Activities: Activity[] = [];
+try {
+  const mod = require('../activities_part3');
+  part3Activities = (mod.part3 ?? []) as Activity[];
+} catch {
+  // not yet present
+}
+
+// Future batch 1 placeholder (sensorial, language, mathematics)
 let batch1Activities: Activity[] = [];
 try {
   const mod = require('./activitiesBatch1');
-  batch1Activities = mod.activitiesBatch1 ?? [];
+  batch1Activities = (mod.activitiesBatch1 ?? []) as Activity[];
 } catch {
-  // batch not yet generated
+  // not yet generated
 }
 
-// Batch 2 (art, science, music-movement, outdoor) — generated activities
+// Future batch 2 placeholder (art, science, music-movement, outdoor)
 let batch2Activities: Activity[] = [];
 try {
   const mod = require('./activitiesBatch2');
-  batch2Activities = mod.activitiesBatch2 ?? [];
+  batch2Activities = (mod.activitiesBatch2 ?? []) as Activity[];
 } catch {
-  // batch not yet generated
+  // not yet generated
 }
 
 let _cachedActivities: Activity[] | null = null;
@@ -33,7 +42,13 @@ let _cachedActivities: Activity[] | null = null;
 export function getAllActivities(): Activity[] {
   if (_cachedActivities) return _cachedActivities;
 
-  const all = [...sampleActivities, ...part1Activities, ...batch1Activities, ...batch2Activities];
+  const all = [
+    ...sampleActivities,
+    ...part2Activities,
+    ...part3Activities,
+    ...batch1Activities,
+    ...batch2Activities,
+  ];
 
   // Deduplicate by id
   const seen = new Set<string>();
