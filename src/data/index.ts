@@ -1,6 +1,15 @@
 import { Activity } from '../types';
 import { sampleActivities } from './sampleActivities';
 
+// Agent-generated partial batch (practical-life PL001-PL050)
+let part1Activities: Activity[] = [];
+try {
+  const mod = require('../activities_part1');
+  part1Activities = (mod.part1 ?? []) as Activity[];
+} catch {
+  // not yet present
+}
+
 // Batch 1 (practical-life, sensorial, language, mathematics) — generated activities
 let batch1Activities: Activity[] = [];
 try {
@@ -24,7 +33,7 @@ let _cachedActivities: Activity[] | null = null;
 export function getAllActivities(): Activity[] {
   if (_cachedActivities) return _cachedActivities;
 
-  const all = [...sampleActivities, ...batch1Activities, ...batch2Activities];
+  const all = [...sampleActivities, ...part1Activities, ...batch1Activities, ...batch2Activities];
 
   // Deduplicate by id
   const seen = new Set<string>();
