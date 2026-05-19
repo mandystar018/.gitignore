@@ -18,6 +18,17 @@ export const colors = {
   shadow: 'rgba(44, 24, 16, 0.08)',
 };
 
+export const categoryGradients: Record<ActivityCategory, [string, string]> = {
+  'practical-life': ['#C4714A', '#E8956A'],
+  'sensorial':      ['#9B6B9B', '#C49BC4'],
+  'language':       ['#4A8FAA', '#72B5CE'],
+  'mathematics':    ['#5B8A5B', '#82B082'],
+  'art':            ['#E8824A', '#F5AA7A'],
+  'science':        ['#4A7BAA', '#6FA3CE'],
+  'music-movement': ['#D4615A', '#E89590'],
+  'outdoor':        ['#7D9B76', '#A8C8A2'],
+};
+
 export const categoryColors: Record<ActivityCategory, string> = {
   'practical-life': '#C4714A',
   'sensorial': '#9B6B9B',

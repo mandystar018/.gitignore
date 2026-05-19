@@ -41,10 +41,9 @@ const QUESTIONS: QuizQuestion[] = [
     emoji: '⏱️',
     multiSelect: false,
     options: [
-      { label: '10 minutes', value: 10, emoji: '⚡' },
-      { label: '20 minutes', value: 20, emoji: '🌤️' },
-      { label: '30 minutes', value: 30, emoji: '☀️' },
-      { label: '1 hour', value: 60, emoji: '🌞' },
+      { label: 'Quick (up to 15 min)', value: 15, emoji: '⚡' },
+      { label: 'Medium (up to 30 min)', value: 30, emoji: '🌤️' },
+      { label: 'About an hour', value: 60, emoji: '☀️' },
       { label: 'All day!', value: 999, emoji: '🌈' },
     ],
   },

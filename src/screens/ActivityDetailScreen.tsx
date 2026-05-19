@@ -5,7 +5,9 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Image,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
@@ -17,6 +19,7 @@ import {
   typography,
   categoryColors,
   categoryEmojis,
+  categoryGradients,
   categoryLabels,
 } from '../theme';
 
@@ -37,74 +40,102 @@ const DIFFICULTY_CONFIG: Record<string, { color: string; label: string; emoji: s
   challenging: { color: '#C4714A', label: 'Challenging', emoji: '🌳' },
 };
 
+function getMaterialColor(type: string): string {
+  if (type === 'household') return '#C4714A';
+  if (type === 'natural') return '#7D9B76';
+  return '#4A8FAA';
+}
+
+// Returns a free, seed-based photo URL so every activity gets a consistent real photo
+function getActivityPhotoUrl(id: string, width = 800, height = 400): string {
+  return `https://picsum.photos/seed/${id}/${width}/${height}`;
+}
+
 export default function ActivityDetailScreen({ navigation, route }: Props) {
   const insets = useSafeAreaInsets();
   const { activity } = route.params;
   const catColor = categoryColors[activity.category];
+  const catGradient = categoryGradients[activity.category];
   const diff = DIFFICULTY_CONFIG[activity.difficulty];
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
+    <View style={[styles.container]}>
+      {/* Gradient hero header — full bleed, overlaps status bar */}
+      <LinearGradient
+        colors={catGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.hero, { paddingTop: insets.top + 8 }]}
+      >
+        {/* Back button overlaid on gradient */}
         <TouchableOpacity
           onPress={() => navigation.goBack()}
-          style={styles.backBtn}
+          style={styles.heroBackBtn}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Text style={styles.backText}>←</Text>
+          <Text style={styles.heroBackText}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {activity.title}
-        </Text>
-        <View style={{ width: 40 }} />
-      </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 32 }]}
-      >
-        <View style={[styles.heroCard, { borderTopColor: catColor }]}>
-          <View style={styles.heroEmojiWrap}>
+        <View style={styles.heroContent}>
+          <View style={styles.heroEmojiCircle}>
             <Text style={styles.heroEmoji}>{categoryEmojis[activity.category]}</Text>
           </View>
+          <Text style={styles.heroCategory}>{categoryLabels[activity.category].toUpperCase()}</Text>
           <Text style={styles.heroTitle}>{activity.title}</Text>
-          <Text style={styles.heroDescription}>{activity.description}</Text>
 
-          <View style={styles.metaRow}>
-            <View style={[styles.metaBadge, { backgroundColor: catColor + '18', borderColor: catColor + '40' }]}>
-              <Text style={[styles.metaBadgeText, { color: catColor }]}>
-                {categoryEmojis[activity.category]} {categoryLabels[activity.category]}
-              </Text>
+          <View style={styles.heroBadgeRow}>
+            <View style={styles.heroBadge}>
+              <Text style={styles.heroBadgeText}>⏱ {activity.duration} min</Text>
             </View>
-            <View style={styles.metaBadge}>
-              <Text style={styles.metaBadgeText}>⏱ {activity.duration} min</Text>
+            <View style={[styles.heroBadge, { backgroundColor: diff.color + '50' }]}>
+              <Text style={styles.heroBadgeText}>{diff.emoji} {diff.label}</Text>
             </View>
-            <View style={[styles.metaBadge, { backgroundColor: diff.color + '18', borderColor: diff.color + '40' }]}>
-              <Text style={[styles.metaBadgeText, { color: diff.color }]}>
-                {diff.emoji} {diff.label}
-              </Text>
-            </View>
-            <View style={styles.metaBadge}>
-              <Text style={styles.metaBadgeText}>
+            <View style={styles.heroBadge}>
+              <Text style={styles.heroBadgeText}>
                 {activity.location === 'indoor' ? '🏠 Indoor' : activity.location === 'outdoor' ? '🌳 Outdoor' : '✨ Either'}
               </Text>
             </View>
           </View>
         </View>
+      </LinearGradient>
 
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 80 }]}
+      >
+        {/* Result photo — real image showing what finished activity looks like */}
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>🌱 Montessori Principle</Text>
+          <Text style={styles.sectionTitle}>📸 What It Looks Like</Text>
+          <View style={styles.photoCard}>
+            <Image
+              source={{ uri: getActivityPhotoUrl(activity.id) }}
+              style={styles.photo}
+              resizeMode="cover"
+            />
+            <View style={[styles.photoOverlay, { backgroundColor: catColor + '22' }]}>
+              <View style={styles.photoLabel}>
+                <Text style={styles.photoLabelText}>{activity.title}</Text>
+              </View>
+            </View>
           </View>
+        </View>
+
+        {/* Description */}
+        <View style={styles.descriptionBox}>
+          <Text style={styles.descriptionText}>{activity.description}</Text>
+        </View>
+
+        {/* Montessori Principle */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>🌱 Montessori Principle</Text>
           <View style={styles.principleBox}>
             <Text style={styles.principleText}>{activity.montessoriPrinciple}</Text>
           </View>
         </View>
 
+        {/* Materials */}
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>🧺 What You'll Need</Text>
-          </View>
+          <Text style={styles.sectionTitle}>🧺 What You'll Need</Text>
           {activity.materials.map((material, index) => (
             <View key={index} style={styles.materialRow}>
               <View style={styles.materialIcon}>
@@ -120,8 +151,9 @@ export default function ActivityDetailScreen({ navigation, route }: Props) {
           ))}
         </View>
 
+        {/* Steps */}
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
+          <View style={styles.sectionHeaderRow}>
             <Text style={styles.sectionTitle}>📋 How To Do It</Text>
             <Text style={styles.sectionCount}>{activity.steps.length} steps</Text>
           </View>
@@ -137,10 +169,9 @@ export default function ActivityDetailScreen({ navigation, route }: Props) {
           ))}
         </View>
 
+        {/* Skills */}
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>✨ Skills Developed</Text>
-          </View>
+          <Text style={styles.sectionTitle}>✨ Skills Developed</Text>
           <View style={styles.skillsWrap}>
             {activity.skills.map((skill, index) => (
               <View key={index} style={[styles.skillChip, { backgroundColor: catColor + '15' }]}>
@@ -149,40 +180,20 @@ export default function ActivityDetailScreen({ navigation, route }: Props) {
             ))}
           </View>
         </View>
-
-        <View style={[styles.section, styles.imageSection]}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>🖼️ Activity Preview</Text>
-          </View>
-          <View style={[styles.imagePlaceholder, { borderColor: catColor + '40' }]}>
-            <Text style={styles.imagePlaceholderEmoji}>{categoryEmojis[activity.category]}</Text>
-            <Text style={styles.imagePlaceholderTitle}>{activity.title}</Text>
-            <Text style={styles.imagePlaceholderHint}>AI image generation coming soon</Text>
-            <View style={styles.imagePromptBox}>
-              <Text style={styles.imagePromptLabel}>Image prompt:</Text>
-              <Text style={styles.imagePromptText}>{activity.imagePrompt}</Text>
-            </View>
-          </View>
-        </View>
       </ScrollView>
 
+      {/* Fixed bottom bar */}
       <View style={[styles.bottomBar, { paddingBottom: insets.bottom + 8 }]}>
         <TouchableOpacity
-          style={[styles.tryButton, { backgroundColor: catColor }]}
+          style={[styles.backButton, { backgroundColor: catColor }]}
           activeOpacity={0.85}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.tryButtonText}>← Back to Activities</Text>
+          <Text style={styles.backButtonText}>← Back to Activities</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
-}
-
-function getMaterialColor(type: string): string {
-  if (type === 'household') return '#C4714A';
-  if (type === 'natural') return '#7D9B76';
-  return '#4A8FAA';
 }
 
 const styles = StyleSheet.create({
@@ -190,107 +201,130 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: colors.background,
-    gap: spacing.sm,
+  hero: {
+    paddingBottom: spacing.lg,
+    paddingHorizontal: spacing.lg,
   },
-  backBtn: {
-    width: 40,
-    height: 40,
+  heroBackBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.25)',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 20,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+    marginBottom: spacing.sm,
   },
-  backText: {
+  heroBackText: {
     fontSize: 18,
-    color: colors.textDark,
+    color: colors.white,
+    fontWeight: '600',
   },
-  headerTitle: {
-    flex: 1,
-    ...typography.h4,
-    textAlign: 'center',
-  },
-  scrollContent: {
-    padding: spacing.md,
-    gap: spacing.lg,
-  },
-  heroCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    borderTopWidth: 4,
+  heroContent: {
     alignItems: 'center',
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 2,
   },
-  heroEmojiWrap: {
+  heroEmojiCircle: {
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: colors.background,
+    backgroundColor: 'rgba(255,255,255,0.25)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
   heroEmoji: {
     fontSize: 36,
   },
+  heroCategory: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: 'rgba(255,255,255,0.8)',
+    letterSpacing: 1.5,
+    marginBottom: 4,
+  },
   heroTitle: {
-    ...typography.h2,
+    fontSize: 26,
+    fontWeight: '800',
+    color: colors.white,
     textAlign: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
+    lineHeight: 32,
   },
-  heroDescription: {
-    ...typography.body,
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: spacing.lg,
-  },
-  metaRow: {
+  heroBadgeRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
     justifyContent: 'center',
   },
-  metaBadge: {
-    paddingHorizontal: spacing.sm + 2,
-    paddingVertical: 5,
+  heroBadge: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: 6,
     borderRadius: radius.full,
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
+    backgroundColor: 'rgba(255,255,255,0.25)',
   },
-  metaBadgeText: {
+  heroBadgeText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: colors.textMedium,
+    fontWeight: '700',
+    color: colors.white,
+  },
+  scrollContent: {
+    padding: spacing.md,
+    gap: spacing.lg,
   },
   section: {
     gap: spacing.sm,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
   },
   sectionTitle: {
     ...typography.h4,
     fontSize: 16,
   },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   sectionCount: {
     ...typography.label,
+  },
+  photoCard: {
+    borderRadius: radius.lg,
+    overflow: 'hidden',
+    height: 200,
+    backgroundColor: colors.border,
+  },
+  photo: {
+    width: '100%',
+    height: '100%',
+  },
+  photoOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: spacing.sm,
+    justifyContent: 'flex-end',
+  },
+  photoLabel: {
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    alignSelf: 'flex-start',
+  },
+  photoLabelText: {
+    color: colors.white,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  descriptionBox: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  descriptionText: {
+    ...typography.body,
+    lineHeight: 22,
   },
   principleBox: {
     backgroundColor: colors.accentLight,
@@ -388,58 +422,23 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textTransform: 'capitalize',
   },
-  imageSection: {},
-  imagePlaceholder: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderStyle: 'dashed',
-  },
-  imagePlaceholderEmoji: {
-    fontSize: 48,
-    marginBottom: spacing.sm,
-  },
-  imagePlaceholderTitle: {
-    ...typography.h4,
-    textAlign: 'center',
-    marginBottom: spacing.xs,
-  },
-  imagePlaceholderHint: {
-    ...typography.bodySmall,
-    marginBottom: spacing.md,
-  },
-  imagePromptBox: {
-    backgroundColor: colors.background,
-    borderRadius: radius.sm,
-    padding: spacing.md,
-    width: '100%',
-  },
-  imagePromptLabel: {
-    ...typography.label,
-    marginBottom: 4,
-    textTransform: 'uppercase',
-  },
-  imagePromptText: {
-    fontSize: 12,
-    color: colors.textMedium,
-    fontStyle: 'italic',
-    lineHeight: 18,
-  },
   bottomBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     paddingHorizontal: spacing.md,
     paddingTop: spacing.md,
     backgroundColor: colors.background,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
-  tryButton: {
+  backButton: {
     borderRadius: radius.full,
     paddingVertical: spacing.md,
     alignItems: 'center',
   },
-  tryButtonText: {
+  backButtonText: {
     color: colors.white,
     fontSize: 16,
     fontWeight: '700',
