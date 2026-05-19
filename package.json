@@ -20,13 +20,11 @@
     "react-native-screens": "~4.4.0",
     "react-native-safe-area-context": "5.4.0",
     "react-native-gesture-handler": "~2.24.0",
-    "@react-native-masked-view/masked-view": "0.3.2",
     "react-native-reanimated": "~3.17.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@types/react": "~18.2.79",
-    "@types/react-native": "~0.73.0",
+    "@types/react": "~18.3.0",
     "typescript": "^5.3.3"
   }
 }
