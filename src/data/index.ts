@@ -1,6 +1,7 @@
 import { Activity } from '../types';
 import { sampleActivities } from './sampleActivities';
 import { babyActivities } from './babyActivities';
+import { moreBabyActivities } from './moreBabyActivities';
 
 // Generated batch: practical-life PL051–PL100
 let part2Activities: Activity[] = [];
@@ -46,6 +47,7 @@ export function getAllActivities(): Activity[] {
   const all = [
     ...sampleActivities,
     ...babyActivities,
+    ...moreBabyActivities,
     ...part2Activities,
     ...part3Activities,
     ...batch1Activities,
