@@ -1,8 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Activity } from '../types';
-import { colors, spacing, radius, typography, categoryColors, categoryEmojis, categoryGradients, categoryLabels } from '../theme';
+import {
+  colors, spacing, radius, typography,
+  categoryColors, categoryEmojis, categoryGradients, categoryLabels,
+} from '../theme';
 
 interface Props {
   activity: Activity;
@@ -12,10 +15,6 @@ interface Props {
 const DIFFICULTY_DOTS: Record<string, number> = { easy: 1, medium: 2, challenging: 3 };
 const MATERIAL_ICONS: Record<string, string> = { household: '🏡', natural: '🍃', store: '🛍️' };
 
-function getActivityPhotoUrl(id: string): string {
-  return `https://picsum.photos/seed/${id}/400/200`;
-}
-
 export default function ActivityCard({ activity, onPress }: Props) {
   const catColor = categoryColors[activity.category];
   const catGradient = categoryGradients[activity.category];
@@ -23,25 +22,25 @@ export default function ActivityCard({ activity, onPress }: Props) {
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.75}>
-      {/* Image header with gradient overlay */}
-      <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: getActivityPhotoUrl(activity.id) }}
-          style={styles.image}
-          resizeMode="cover"
-        />
-        <LinearGradient
-          colors={[catGradient[0] + 'CC', catGradient[1] + '99']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.imageOverlay}
-        >
-          <Text style={styles.imageEmoji}>{categoryEmojis[activity.category]}</Text>
-          <View style={styles.imageDuration}>
-            <Text style={styles.imageDurationText}>⏱ {activity.duration} min</Text>
+      {/* Gradient header strip */}
+      <LinearGradient
+        colors={catGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.gradientStrip}
+      >
+        <Text style={styles.stripEmoji}>{categoryEmojis[activity.category]}</Text>
+        <View style={styles.stripRight}>
+          <View style={styles.durationBadge}>
+            <Text style={styles.durationText}>⏱ {activity.duration} min</Text>
           </View>
-        </LinearGradient>
-      </View>
+          <View style={styles.locationBadge}>
+            <Text style={styles.locationText}>
+              {activity.location === 'indoor' ? '🏠' : activity.location === 'outdoor' ? '🌳' : '✨'}
+            </Text>
+          </View>
+        </View>
+      </LinearGradient>
 
       {/* Card body */}
       <View style={styles.body}>
@@ -67,14 +66,10 @@ export default function ActivityCard({ activity, onPress }: Props) {
         </View>
 
         <Text style={styles.title} numberOfLines={2}>{activity.title}</Text>
-
         <Text style={styles.description} numberOfLines={2}>{activity.description}</Text>
 
         <View style={styles.bottomRow}>
           <View style={styles.metaGroup}>
-            <Text style={styles.metaIcon}>
-              {activity.location === 'indoor' ? '🏠' : activity.location === 'outdoor' ? '🌳' : '✨'}
-            </Text>
             {materialTypes.map((type) => (
               <Text key={type} style={styles.metaIcon}>{MATERIAL_ICONS[type]}</Text>
             ))}
@@ -99,40 +94,30 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  imageContainer: {
-    height: 110,
-    backgroundColor: colors.border,
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-  imageOverlay: {
-    position: 'absolute',
-    inset: 0,
+  gradientStrip: {
+    height: 64,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
   },
-  imageEmoji: {
-    fontSize: 36,
-  },
-  imageDuration: {
-    backgroundColor: 'rgba(0,0,0,0.35)',
+  stripEmoji: { fontSize: 32 },
+  stripRight: { flexDirection: 'row', gap: spacing.sm, alignItems: 'center' },
+  durationBadge: {
+    backgroundColor: 'rgba(255,255,255,0.30)',
     borderRadius: radius.full,
     paddingHorizontal: spacing.sm + 2,
     paddingVertical: 4,
   },
-  imageDurationText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: colors.white,
+  durationText: { fontSize: 12, fontWeight: '700', color: colors.white },
+  locationBadge: {
+    backgroundColor: 'rgba(255,255,255,0.30)',
+    borderRadius: radius.full,
+    width: 30, height: 30,
+    alignItems: 'center', justifyContent: 'center',
   },
-  body: {
-    padding: spacing.md,
-    gap: spacing.xs + 2,
-  },
+  locationText: { fontSize: 14 },
+  body: { padding: spacing.md, gap: spacing.xs + 2 },
   topRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -143,47 +128,18 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: radius.full,
   },
-  categoryLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.3,
-  },
-  difficultyRow: {
-    flexDirection: 'row',
-    gap: 4,
-    alignItems: 'center',
-  },
-  difficultyDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-  },
-  title: {
-    ...typography.h4,
-    fontSize: 16,
-    lineHeight: 21,
-  },
-  description: {
-    ...typography.bodySmall,
-    lineHeight: 18,
-  },
+  categoryLabel: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.3 },
+  difficultyRow: { flexDirection: 'row', gap: 4, alignItems: 'center' },
+  difficultyDot: { width: 7, height: 7, borderRadius: 3.5 },
+  title: { ...typography.h4, fontSize: 16, lineHeight: 21 },
+  description: { ...typography.bodySmall, lineHeight: 18 },
   bottomRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 2,
   },
-  metaGroup: {
-    flexDirection: 'row',
-    gap: 4,
-    alignItems: 'center',
-  },
-  metaIcon: {
-    fontSize: 14,
-  },
-  tapHint: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
+  metaGroup: { flexDirection: 'row', gap: 4, alignItems: 'center' },
+  metaIcon: { fontSize: 14 },
+  tapHint: { fontSize: 12, fontWeight: '700' },
 });

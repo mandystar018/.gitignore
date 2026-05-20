@@ -6,6 +6,7 @@ export const sampleActivities: Activity[] = [
     title: 'Water Pouring Practice',
     description: 'The child pours water from a small pitcher into a glass, building precision and control. This foundational Montessori activity develops the wrist rotation needed for many daily life tasks.',
     category: 'practical-life',
+    ageRange: '3-6 years',
     duration: 15,
     location: 'indoor',
     materials: [
@@ -33,6 +34,7 @@ export const sampleActivities: Activity[] = [
     title: 'Banana Slicing',
     description: 'Using a child-safe knife, the toddler slices a banana into rounds for a snack. Real food prep work gives children genuine responsibility and satisfaction.',
     category: 'practical-life',
+    ageRange: '3-6 years',
     duration: 15,
     location: 'indoor',
     materials: [
@@ -61,6 +63,7 @@ export const sampleActivities: Activity[] = [
     title: 'Sweeping with a Small Broom',
     description: 'Children sweep a small area using a child-sized broom and dustpan. Caring for the environment is a core Montessori value that builds responsibility and motor skills.',
     category: 'practical-life',
+    ageRange: '3-6 years',
     duration: 10,
     location: 'indoor',
     materials: [
@@ -87,6 +90,7 @@ export const sampleActivities: Activity[] = [
     title: 'Folding Washcloths',
     description: 'Toddlers practice folding small washcloths in half and then in half again. This simple laundry task builds precision, order, and the joy of contributing to household work.',
     category: 'practical-life',
+    ageRange: '3-6 years',
     duration: 15,
     location: 'indoor',
     materials: [
@@ -112,6 +116,7 @@ export const sampleActivities: Activity[] = [
     title: 'Watering Plants',
     description: 'The child uses a small watering can to tend to household plants. This activity connects care for living things with purposeful work and builds routine.',
     category: 'practical-life',
+    ageRange: '3-6 years',
     duration: 10,
     location: 'indoor',
     materials: [
@@ -139,6 +144,7 @@ export const sampleActivities: Activity[] = [
     title: 'Color Sorting with Pompoms',
     description: 'Children sort colorful pompoms by color into matching containers using tongs. This activity builds color discrimination, fine motor skills, and the joy of order.',
     category: 'sensorial',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'indoor',
     materials: [
@@ -166,6 +172,7 @@ export const sampleActivities: Activity[] = [
     title: 'Mystery Texture Bag',
     description: 'Children reach into a bag without looking and describe what they feel. This tactile activity builds sensory vocabulary and the ability to focus attention on touch.',
     category: 'sensorial',
+    ageRange: '3-6 years',
     duration: 15,
     location: 'indoor',
     materials: [
@@ -192,6 +199,7 @@ export const sampleActivities: Activity[] = [
     title: 'Smelling Jars',
     description: 'Children match pairs of jars by smell, developing their olfactory sense and the language to describe scent. A beautiful, calming Montessori sensorial activity.',
     category: 'sensorial',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'indoor',
     materials: [
@@ -219,6 +227,7 @@ export const sampleActivities: Activity[] = [
     title: 'Nature Texture Walk',
     description: 'On a short walk, children collect natural items of different textures and create a simple texture board. Combines outdoor sensorial exploration with a creative extension.',
     category: 'sensorial',
+    ageRange: '3-6 years',
     duration: 30,
     location: 'outdoor',
     materials: [
@@ -246,6 +255,7 @@ export const sampleActivities: Activity[] = [
     title: 'I Spy Sound Game',
     description: 'The classic "I spy with my little eye" game played with initial sounds instead of colors. This builds phonemic awareness — the critical pre-reading skill.',
     category: 'language',
+    ageRange: '3-6 years',
     duration: 10,
     location: 'indoor',
     materials: [
@@ -270,6 +280,7 @@ export const sampleActivities: Activity[] = [
     title: 'Object Naming Basket',
     description: 'A basket of miniature objects gives children concrete vocabulary to match with words. This is a foundational Montessori language activity for building rich vocabulary.',
     category: 'language',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'indoor',
     materials: [
@@ -297,6 +308,7 @@ export const sampleActivities: Activity[] = [
     title: 'Sand Tray Letter Tracing',
     description: 'Children trace letter shapes in a sand tray before ever picking up a pencil. The whole-body experience of writing in sand prepares the hand and mind for writing.',
     category: 'language',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'indoor',
     materials: [
@@ -324,6 +336,7 @@ export const sampleActivities: Activity[] = [
     title: 'Counting Stones on a Number Line',
     description: 'Children place smooth stones one by one on a numbered paper line, learning that each number represents an exact quantity. A beautiful, concrete early maths activity.',
     category: 'mathematics',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'indoor',
     materials: [
@@ -351,6 +364,7 @@ export const sampleActivities: Activity[] = [
     title: 'Shape Sorting Tray',
     description: 'Children sort wooden or cardboard shapes into matching outlines drawn on a tray. This develops geometric awareness and the satisfying feeling of things fitting perfectly.',
     category: 'mathematics',
+    ageRange: '3-6 years',
     duration: 15,
     location: 'indoor',
     materials: [
@@ -378,6 +392,7 @@ export const sampleActivities: Activity[] = [
     title: 'Watercolor Painting on Wet Paper',
     description: 'Painting with watercolors on pre-wet paper creates beautiful color blooms that fascinate toddlers. The open-ended, process-focused art builds creativity and sensory joy.',
     category: 'art',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'indoor',
     materials: [
@@ -407,6 +422,7 @@ export const sampleActivities: Activity[] = [
     title: 'Playdough Sculpting',
     description: 'Children squish, roll, poke, and shape playdough to build objects of their own invention. This deeply satisfying sensory activity is a cornerstone of toddler creativity.',
     category: 'art',
+    ageRange: '3-6 years',
     duration: 30,
     location: 'indoor',
     materials: [
@@ -435,6 +451,7 @@ export const sampleActivities: Activity[] = [
     title: 'Nature Collage',
     description: 'Children glue collected natural items — leaves, petals, seeds, bark — onto paper to create a collage. This bridges art and nature exploration beautifully.',
     category: 'art',
+    ageRange: '3-6 years',
     duration: 25,
     location: 'both',
     materials: [
@@ -463,6 +480,7 @@ export const sampleActivities: Activity[] = [
     title: 'Sink or Float Experiment',
     description: 'Children test whether household objects sink or float in a tub of water, developing early scientific thinking: observing, predicting, and discovering.',
     category: 'science',
+    ageRange: '3-6 years',
     duration: 25,
     location: 'indoor',
     materials: [
@@ -491,6 +509,7 @@ export const sampleActivities: Activity[] = [
     title: 'Baking Soda Volcano',
     description: 'The classic chemical reaction of baking soda and vinegar delights toddlers and introduces the concept of a chemical reaction in a dramatic, memorable way.',
     category: 'science',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'both',
     materials: [
@@ -520,6 +539,7 @@ export const sampleActivities: Activity[] = [
     title: 'Seed Planting and Observation',
     description: 'Children plant fast-growing seeds (beans, sunflowers) in clear containers so they can watch roots and shoots emerge. This introduces the full life cycle of plants.',
     category: 'science',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'indoor',
     materials: [
@@ -549,6 +569,7 @@ export const sampleActivities: Activity[] = [
     title: 'Freeze Dance',
     description: 'Children dance freely to music and freeze like a statue when the music stops. This classic game builds body control, listening skills, and the pure joy of movement.',
     category: 'music-movement',
+    ageRange: '3-6 years',
     duration: 15,
     location: 'indoor',
     materials: [
@@ -575,6 +596,7 @@ export const sampleActivities: Activity[] = [
     title: 'Toddler Yoga Animals',
     description: 'Children move through animal yoga poses — downward dog, cat-cow, butterfly — building body awareness, flexibility, and the calming effect of slow, mindful movement.',
     category: 'music-movement',
+    ageRange: '3-6 years',
     duration: 15,
     location: 'indoor',
     materials: [
@@ -601,6 +623,7 @@ export const sampleActivities: Activity[] = [
     title: 'Rhythm Clapping with Household Instruments',
     description: 'Children make simple instruments from kitchen items — spoons on pots, dried beans in a jar — and explore rhythm together. A joyful introduction to music-making.',
     category: 'music-movement',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'indoor',
     materials: [
@@ -628,6 +651,7 @@ export const sampleActivities: Activity[] = [
     title: 'Nature Scavenger Hunt',
     description: 'A picture-based outdoor scavenger hunt guides children to find natural treasures in the backyard or park. Builds observation skills and vocabulary through play.',
     category: 'outdoor',
+    ageRange: '3-6 years',
     duration: 30,
     location: 'outdoor',
     materials: [
@@ -655,6 +679,7 @@ export const sampleActivities: Activity[] = [
     title: 'Mud Kitchen Play',
     description: 'An outdoor play kitchen made from natural materials lets children cook, pour, mix, and create with mud and water. Deeply engaging, sensory-rich play with real-world materials.',
     category: 'outdoor',
+    ageRange: '3-6 years',
     duration: 45,
     location: 'outdoor',
     materials: [
@@ -683,6 +708,7 @@ export const sampleActivities: Activity[] = [
     title: 'Nature Mandala',
     description: 'Children create a circular mandala pattern on the ground using stones, leaves, petals, and sticks. This meditative outdoor art connects creativity to the natural world.',
     category: 'outdoor',
+    ageRange: '3-6 years',
     duration: 30,
     location: 'outdoor',
     materials: [
@@ -709,6 +735,7 @@ export const sampleActivities: Activity[] = [
     title: 'Painted Rock Garden',
     description: 'Children paint collected rocks with watercolors or acrylic paint to create garden decorations. This combines nature exploration, art, and creating something lasting and useful.',
     category: 'outdoor',
+    ageRange: '3-6 years',
     duration: 30,
     location: 'both',
     materials: [
@@ -737,6 +764,7 @@ export const sampleActivities: Activity[] = [
     title: 'Spreading Butter on Bread',
     description: 'Children spread softened butter on their own toast or bread using a small spreading knife. This practical food prep builds independence and fine motor control.',
     category: 'practical-life',
+    ageRange: '3-6 years',
     duration: 10,
     location: 'indoor',
     materials: [
@@ -764,6 +792,7 @@ export const sampleActivities: Activity[] = [
     title: 'Flower Arranging',
     description: 'Children trim flower stems and arrange them in a small vase. This beautiful practical life activity develops fine motor skills and aesthetic appreciation.',
     category: 'practical-life',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'indoor',
     materials: [
@@ -792,6 +821,7 @@ export const sampleActivities: Activity[] = [
     title: 'Sorting by Size: Big and Small',
     description: 'Children sort a collection of similar objects (buttons, stones, shells) into groups by size. This builds visual discrimination and foundational mathematical concepts.',
     category: 'sensorial',
+    ageRange: '3-6 years',
     duration: 15,
     location: 'indoor',
     materials: [
@@ -819,6 +849,7 @@ export const sampleActivities: Activity[] = [
     title: 'Making a Family Photo Book',
     description: 'Children help arrange family photos into a simple book. Looking at and discussing familiar faces develops language, memory, and emotional intelligence.',
     category: 'language',
+    ageRange: '3-6 years',
     duration: 30,
     location: 'indoor',
     materials: [
@@ -846,6 +877,7 @@ export const sampleActivities: Activity[] = [
     title: 'Measuring with Non-Standard Units',
     description: 'Children measure objects in the house using their hands, feet, or blocks as units. This introduces measurement concepts in a playful, concrete way before rulers.',
     category: 'mathematics',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'indoor',
     materials: [
@@ -873,6 +905,7 @@ export const sampleActivities: Activity[] = [
     title: 'Ice Melting Observation',
     description: 'Children observe ice cubes melt in different conditions — in sun, in shade, in warm water — building understanding of temperature and states of matter.',
     category: 'science',
+    ageRange: '3-6 years',
     duration: 30,
     location: 'both',
     materials: [
@@ -901,6 +934,7 @@ export const sampleActivities: Activity[] = [
     title: 'Obstacle Course',
     description: 'A simple indoor obstacle course built from cushions, chairs, and tape challenges gross motor skills while encouraging problem-solving and physical confidence.',
     category: 'music-movement',
+    ageRange: '3-6 years',
     duration: 25,
     location: 'indoor',
     materials: [
@@ -929,6 +963,7 @@ export const sampleActivities: Activity[] = [
     title: 'Gardening: Planting Seeds',
     description: 'Children dig small holes, drop in seeds, cover with soil, and water. This complete cycle of gardening work builds responsibility, patience, and connection to food systems.',
     category: 'outdoor',
+    ageRange: '3-6 years',
     duration: 30,
     location: 'outdoor',
     materials: [
@@ -958,6 +993,7 @@ export const sampleActivities: Activity[] = [
     title: 'Setting the Table',
     description: 'Children place plates, cups, and utensils in the correct positions for a family meal. This practical task builds sequencing, spatial awareness, and the joy of contributing.',
     category: 'practical-life',
+    ageRange: '3-6 years',
     duration: 10,
     location: 'indoor',
     materials: [
@@ -984,6 +1020,7 @@ export const sampleActivities: Activity[] = [
     title: 'Puppet Show Storytelling',
     description: 'Children use finger puppets or simple sock puppets to act out stories. This imaginative activity builds narrative language, creativity, and social-emotional vocabulary.',
     category: 'language',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'indoor',
     materials: [
@@ -1010,6 +1047,7 @@ export const sampleActivities: Activity[] = [
     title: 'Pattern Making with Buttons',
     description: 'Children create and extend simple color or shape patterns using buttons. This foundational math activity develops logical thinking and prepares for algebra.',
     category: 'mathematics',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'indoor',
     materials: [
@@ -1036,6 +1074,7 @@ export const sampleActivities: Activity[] = [
     title: 'Leaf Printing',
     description: 'Children press paint-covered leaves onto paper to make beautiful prints. This process art activity celebrates the intricate patterns in nature and builds fine motor skills.',
     category: 'art',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'both',
     materials: [
@@ -1064,6 +1103,7 @@ export const sampleActivities: Activity[] = [
     title: 'Color Mixing with Water',
     description: 'Children mix colored water in clear cups to discover what happens when colors combine. A magical introduction to color theory and scientific experimentation.',
     category: 'science',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'indoor',
     materials: [
@@ -1093,6 +1133,7 @@ export const sampleActivities: Activity[] = [
     title: 'Balance Beam Walking',
     description: 'A strip of tape on the floor becomes a balance beam. Children walk forward, backward, and sideways, developing balance, proprioception, and body confidence.',
     category: 'music-movement',
+    ageRange: '3-6 years',
     duration: 15,
     location: 'indoor',
     materials: [
@@ -1119,6 +1160,7 @@ export const sampleActivities: Activity[] = [
     title: 'Polishing Shoes',
     description: 'Children polish a pair of shoes with a soft cloth, developing care for possessions, concentration, and the satisfying feeling of making something shiny again.',
     category: 'practical-life',
+    ageRange: '3-6 years',
     duration: 15,
     location: 'indoor',
     materials: [
@@ -1148,6 +1190,7 @@ export const sampleActivities: Activity[] = [
     title: 'Sound Cylinders Matching',
     description: 'Children match pairs of sealed containers by the sounds they make when shaken. This classic Montessori activity isolates the auditory sense for focused development.',
     category: 'sensorial',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'indoor',
     materials: [
@@ -1174,6 +1217,7 @@ export const sampleActivities: Activity[] = [
     title: 'Vegetable Stamp Printing',
     description: 'Cutting vegetables in half reveals patterns perfect for stamping. Peppers, potatoes, celery make spectacular prints that delight children and connect art to food.',
     category: 'art',
+    ageRange: '3-6 years',
     duration: 25,
     location: 'indoor',
     materials: [
@@ -1202,6 +1246,7 @@ export const sampleActivities: Activity[] = [
     title: 'Cloud Watching and Naming',
     description: 'Children lie on a blanket and observe clouds, naming shapes and making up stories. This quiet, mindful outdoor activity builds imagination and scientific vocabulary.',
     category: 'outdoor',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'outdoor',
     materials: [
@@ -1228,6 +1273,7 @@ export const sampleActivities: Activity[] = [
     title: 'Rhyming Word Games',
     description: 'Simple rhyming games build phonological awareness — the ability to hear and manipulate sounds in words. This is one of the strongest predictors of early reading success.',
     category: 'language',
+    ageRange: '3-6 years',
     duration: 10,
     location: 'indoor',
     materials: [
@@ -1253,6 +1299,7 @@ export const sampleActivities: Activity[] = [
     title: 'Counting Beads on a String',
     description: 'Children thread a set number of beads onto a pipe cleaner or string, combining fine motor practice with counting and quantity awareness.',
     category: 'mathematics',
+    ageRange: '3-6 years',
     duration: 20,
     location: 'indoor',
     materials: [

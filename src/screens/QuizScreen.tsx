@@ -6,12 +6,10 @@ import {
   TouchableOpacity,
   ScrollView,
   Animated,
-  Dimensions,
-  Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList, ActivityCategory, MaterialType, LocationType } from '../types';
+import { RootStackParamList, ActivityCategory, MaterialType, LocationType, AgeRange } from '../types';
 import { colors, spacing, radius, typography, categoryColors, categoryEmojis, categoryLabels } from '../theme';
 
 type Props = {
@@ -20,6 +18,7 @@ type Props = {
 
 interface QuizOption {
   label: string;
+  sublabel?: string;
   value: string | number;
   emoji?: string;
 }
@@ -35,16 +34,31 @@ interface QuizQuestion {
 
 const QUESTIONS: QuizQuestion[] = [
   {
+    id: 'ageRange',
+    question: 'How old is your little one?',
+    subtitle: "We'll match activities to their stage of development",
+    emoji: '👶',
+    multiSelect: false,
+    options: [
+      { label: '0 – 6 months', sublabel: 'Newborn', value: '0-6 months', emoji: '🌙' },
+      { label: '6 – 12 months', sublabel: 'Young baby', value: '6-12 months', emoji: '🌱' },
+      { label: '12 – 18 months', sublabel: 'Older baby', value: '12-18 months', emoji: '🌿' },
+      { label: '18 – 24 months', sublabel: 'Young toddler', value: '18-24 months', emoji: '🌻' },
+      { label: '2 – 3 years', sublabel: 'Toddler', value: '2-3 years', emoji: '🌳' },
+      { label: '3 – 6 years', sublabel: 'Preschooler', value: '3-6 years', emoji: '🌈' },
+    ],
+  },
+  {
     id: 'duration',
     question: 'How much time do you have?',
     subtitle: "We'll match activities to fit your schedule",
     emoji: '⏱️',
     multiSelect: false,
     options: [
-      { label: 'Quick (up to 15 min)', value: 15, emoji: '⚡' },
-      { label: 'Medium (up to 30 min)', value: 30, emoji: '🌤️' },
-      { label: 'About an hour', value: 60, emoji: '☀️' },
-      { label: 'All day!', value: 999, emoji: '🌈' },
+      { label: 'Quick', sublabel: 'Up to 15 minutes', value: 15, emoji: '⚡' },
+      { label: 'Medium', sublabel: 'Up to 30 minutes', value: 30, emoji: '☀️' },
+      { label: 'About an hour', sublabel: '30–60 minutes', value: 60, emoji: '🌞' },
+      { label: 'All day!', sublabel: 'Open-ended', value: 999, emoji: '🌈' },
     ],
   },
   {
@@ -89,42 +103,26 @@ export default function QuizScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({
+    ageRange: null,
     duration: null,
     location: null,
     materials: [] as MaterialType[],
     category: [] as ActivityCategory[],
   });
-  const progressAnim = useRef(new Animated.Value(0)).current;
+  const progressAnim = useRef(new Animated.Value(1 / QUESTIONS.length)).current;
   const cardAnim = useRef(new Animated.Value(0)).current;
 
   const question = QUESTIONS[currentIndex];
-  const progress = (currentIndex + 1) / QUESTIONS.length;
 
   const animateProgress = (toValue: number) => {
-    Animated.spring(progressAnim, {
-      toValue,
-      friction: 8,
-      useNativeDriver: false,
-    }).start();
+    Animated.spring(progressAnim, { toValue, friction: 8, useNativeDriver: false }).start();
   };
 
   const animateCard = (direction: 1 | -1, callback: () => void) => {
     Animated.sequence([
-      Animated.timing(cardAnim, {
-        toValue: direction * -40,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-      Animated.timing(cardAnim, {
-        toValue: direction * 60,
-        duration: 0,
-        useNativeDriver: true,
-      }),
-      Animated.spring(cardAnim, {
-        toValue: 0,
-        friction: 8,
-        useNativeDriver: true,
-      }),
+      Animated.timing(cardAnim, { toValue: direction * -40, duration: 150, useNativeDriver: true }),
+      Animated.timing(cardAnim, { toValue: direction * 60, duration: 0, useNativeDriver: true }),
+      Animated.spring(cardAnim, { toValue: 0, friction: 8, useNativeDriver: true }),
     ]).start();
     setTimeout(callback, 120);
   };
@@ -145,9 +143,7 @@ export default function QuizScreen({ navigation }: Props) {
 
   const isSelected = (value: string | number): boolean => {
     const qId = question.id;
-    if (question.multiSelect) {
-      return (answers[qId] || []).includes(value);
-    }
+    if (question.multiSelect) return (answers[qId] || []).includes(value);
     return answers[qId] === value;
   };
 
@@ -159,18 +155,19 @@ export default function QuizScreen({ navigation }: Props) {
 
   const handleNext = () => {
     if (!canProceed()) return;
-
     if (currentIndex < QUESTIONS.length - 1) {
       animateCard(1, () => setCurrentIndex((i) => i + 1));
       animateProgress((currentIndex + 2) / QUESTIONS.length);
     } else {
-      const quizAnswers = {
-        duration: answers.duration ?? 999,
-        location: (answers.location ?? 'any') as LocationType | 'any',
-        materials: (answers.materials ?? []) as MaterialType[],
-        categories: (answers.category ?? []) as ActivityCategory[],
-      };
-      navigation.navigate('Activities', { answers: quizAnswers });
+      navigation.navigate('Activities', {
+        answers: {
+          ageRange: (answers.ageRange ?? '3-6 years') as AgeRange,
+          duration: answers.duration ?? 999,
+          location: (answers.location ?? 'any') as LocationType | 'any',
+          materials: (answers.materials ?? []) as MaterialType[],
+          categories: (answers.category ?? []) as ActivityCategory[],
+        },
+      });
     }
   };
 
@@ -188,13 +185,15 @@ export default function QuizScreen({ navigation }: Props) {
       animateCard(1, () => setCurrentIndex((i) => i + 1));
       animateProgress((currentIndex + 2) / QUESTIONS.length);
     } else {
-      const quizAnswers = {
-        duration: answers.duration ?? 999,
-        location: (answers.location ?? 'any') as LocationType | 'any',
-        materials: (answers.materials ?? []) as MaterialType[],
-        categories: (answers.category ?? []) as ActivityCategory[],
-      };
-      navigation.navigate('Activities', { answers: quizAnswers });
+      navigation.navigate('Activities', {
+        answers: {
+          ageRange: (answers.ageRange ?? '3-6 years') as AgeRange,
+          duration: answers.duration ?? 999,
+          location: (answers.location ?? 'any') as LocationType | 'any',
+          materials: (answers.materials ?? []) as MaterialType[],
+          categories: (answers.category ?? []) as ActivityCategory[],
+        },
+      });
     }
   };
 
@@ -218,16 +217,15 @@ export default function QuizScreen({ navigation }: Props) {
               ]}
             />
           </View>
-          <Text style={styles.progressLabel}>
-            {currentIndex + 1} of {QUESTIONS.length}
-          </Text>
+          <Text style={styles.progressLabel}>{currentIndex + 1} of {QUESTIONS.length}</Text>
         </View>
-        {question.multiSelect && (
+        {question.multiSelect ? (
           <TouchableOpacity onPress={handleSkip} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
             <Text style={styles.skipText}>Skip</Text>
           </TouchableOpacity>
+        ) : (
+          <View style={{ width: 40 }} />
         )}
-        {!question.multiSelect && <View style={{ width: 40 }} />}
       </View>
 
       <Animated.View style={[styles.questionCard, { transform: [{ translateX: cardAnim }] }]}>
@@ -236,41 +234,32 @@ export default function QuizScreen({ navigation }: Props) {
         <Text style={styles.questionSubtitle}>{question.subtitle}</Text>
       </Animated.View>
 
-      <ScrollView
-        style={styles.optionsScroll}
-        contentContainerStyle={styles.optionsContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.optionsScroll} contentContainerStyle={styles.optionsContent} showsVerticalScrollIndicator={false}>
         {question.options.map((option) => {
           const selected = isSelected(option.value);
           const isCategoryQ = question.id === 'category';
-          const catColor = isCategoryQ
-            ? categoryColors[option.value as ActivityCategory]
-            : colors.primary;
+          const catColor = isCategoryQ ? categoryColors[option.value as ActivityCategory] : colors.primary;
 
           return (
             <TouchableOpacity
               key={String(option.value)}
-              style={[
-                styles.optionCard,
-                selected && { borderColor: catColor, backgroundColor: catColor + '12' },
-              ]}
+              style={[styles.optionCard, selected && { borderColor: catColor, backgroundColor: catColor + '12' }]}
               onPress={() => selectOption(option.value)}
               activeOpacity={0.7}
             >
               {option.emoji && (
-                <View
-                  style={[
-                    styles.optionEmojiBox,
-                    selected && { backgroundColor: catColor + '25' },
-                  ]}
-                >
+                <View style={[styles.optionEmojiBox, selected && { backgroundColor: catColor + '25' }]}>
                   <Text style={styles.optionEmoji}>{option.emoji}</Text>
                 </View>
               )}
-              <Text style={[styles.optionLabel, selected && { color: catColor, fontWeight: '700' }]}>
-                {option.label}
-              </Text>
+              <View style={styles.optionTextGroup}>
+                <Text style={[styles.optionLabel, selected && { color: catColor, fontWeight: '700' }]}>
+                  {option.label}
+                </Text>
+                {option.sublabel && (
+                  <Text style={styles.optionSublabel}>{option.sublabel}</Text>
+                )}
+              </View>
               {selected && (
                 <View style={[styles.checkCircle, { backgroundColor: catColor }]}>
                   <Text style={styles.checkMark}>✓</Text>
@@ -298,10 +287,7 @@ export default function QuizScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+  container: { flex: 1, backgroundColor: colors.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -310,124 +296,61 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   backBtn: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 40, height: 40,
+    alignItems: 'center', justifyContent: 'center',
     borderRadius: 20,
     backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: 1, borderColor: colors.border,
   },
-  backText: {
-    fontSize: 18,
-    color: colors.textDark,
-  },
-  progressContainer: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 4,
-  },
+  backText: { fontSize: 18, color: colors.textDark },
+  progressContainer: { flex: 1, alignItems: 'center', gap: 4 },
   progressTrack: {
-    height: 6,
-    width: '100%',
-    backgroundColor: colors.border,
-    borderRadius: 3,
-    overflow: 'hidden',
+    height: 6, width: '100%',
+    backgroundColor: colors.border, borderRadius: 3, overflow: 'hidden',
   },
-  progressFill: {
-    height: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: 3,
-  },
-  progressLabel: {
-    ...typography.label,
-    fontSize: 11,
-  },
-  skipText: {
-    width: 40,
-    textAlign: 'right',
-    fontSize: 14,
-    color: colors.textLight,
-    fontWeight: '600',
-  },
+  progressFill: { height: '100%', backgroundColor: colors.primary, borderRadius: 3 },
+  progressLabel: { ...typography.label, fontSize: 11 },
+  skipText: { width: 40, textAlign: 'right', fontSize: 14, color: colors.textLight, fontWeight: '600' },
   questionCard: {
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.lg,
     alignItems: 'center',
   },
-  questionEmoji: {
-    fontSize: 44,
-    marginBottom: spacing.md,
-  },
-  questionText: {
-    ...typography.h2,
-    textAlign: 'center',
-    marginBottom: spacing.sm,
-  },
-  questionSubtitle: {
-    ...typography.body,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  optionsScroll: {
-    flex: 1,
-  },
-  optionsContent: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
-    gap: spacing.sm,
-  },
+  questionEmoji: { fontSize: 44, marginBottom: spacing.md },
+  questionText: { ...typography.h2, textAlign: 'center', marginBottom: spacing.sm },
+  questionSubtitle: { ...typography.body, textAlign: 'center', lineHeight: 20 },
+  optionsScroll: { flex: 1 },
+  optionsContent: { paddingHorizontal: spacing.lg, paddingBottom: spacing.md, gap: spacing.sm },
   optionCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     padding: spacing.md,
-    borderWidth: 2,
-    borderColor: colors.border,
+    borderWidth: 2, borderColor: colors.border,
     gap: spacing.md,
     shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
-    elevation: 1,
+    shadowOpacity: 1, shadowRadius: 4, elevation: 1,
   },
   optionEmojiBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 44, height: 44, borderRadius: 22,
     backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'center', justifyContent: 'center',
   },
-  optionEmoji: {
-    fontSize: 22,
-  },
-  optionLabel: {
-    flex: 1,
-    fontSize: 16,
-    color: colors.textDark,
-    fontWeight: '500',
-  },
+  optionEmoji: { fontSize: 22 },
+  optionTextGroup: { flex: 1 },
+  optionLabel: { fontSize: 16, color: colors.textDark, fontWeight: '500' },
+  optionSublabel: { fontSize: 12, color: colors.textLight, marginTop: 1 },
   checkCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 24, height: 24, borderRadius: 12,
+    alignItems: 'center', justifyContent: 'center',
   },
-  checkMark: {
-    color: colors.white,
-    fontSize: 13,
-    fontWeight: '700',
-  },
+  checkMark: { color: colors.white, fontSize: 13, fontWeight: '700' },
   footer: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
+    paddingHorizontal: spacing.lg, paddingTop: spacing.md,
     backgroundColor: colors.background,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopWidth: 1, borderTopColor: colors.border,
   },
   nextButton: {
     backgroundColor: colors.primary,
@@ -436,18 +359,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOpacity: 0.3, shadowRadius: 8, elevation: 4,
   },
-  nextButtonDisabled: {
-    backgroundColor: colors.border,
-    shadowOpacity: 0,
-    elevation: 0,
-  },
-  nextButtonText: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.white,
-  },
+  nextButtonDisabled: { backgroundColor: colors.border, shadowOpacity: 0, elevation: 0 },
+  nextButtonText: { fontSize: 17, fontWeight: '700', color: colors.white },
 });

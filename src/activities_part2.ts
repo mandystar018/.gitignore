@@ -5,6 +5,7 @@ export const part2 = [
     title: "Measuring Ingredients with Cups",
     description: "The child uses measuring cups to scoop and level flour, sugar, or oats when baking, learning about measurement and quantity. This hands-on math-in-context activity builds precision and contributes to a real baking project.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 15,
     location: "indoor",
     materials: [
@@ -33,6 +34,7 @@ export const part2 = [
     title: "Hammering Golf Tees into Foam",
     description: "The child uses a toy mallet to hammer golf tees into a foam block, developing eye-hand coordination and hand strength. This satisfying hammering activity builds the arm control needed for many practical tasks.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -60,6 +62,7 @@ export const part2 = [
     title: "Threading Large Beads",
     description: "The child strings large wooden beads onto a lace or pipe cleaner, developing the pincer grip and hand-eye coordination needed for writing. Creating a necklace or bracelet adds a personal, creative dimension.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 15,
     location: "indoor",
     materials: [
@@ -86,6 +89,7 @@ export const part2 = [
     title: "Scrubbing a Muddy Boot",
     description: "The child uses a stiff brush and water to scrub mud off a boot, developing arm strength and responsibility for their own belongings. Seeing the boot transform from muddy to clean is deeply satisfying.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 15,
     location: "outdoor",
     materials: [
@@ -114,6 +118,7 @@ export const part2 = [
     title: "Sweeping the Porch",
     description: "The child sweeps a porch or patio with a small outdoor broom, clearing leaves and debris, contributing to outdoor space maintenance. This full-body task builds coordination and connection to the outdoor environment.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 15,
     location: "outdoor",
     materials: [
@@ -139,6 +144,7 @@ export const part2 = [
     title: "Making Orange Peel Twists",
     description: "The child uses a peeler to create orange peel twists for decoration, developing fine motor control and an appreciation for food aesthetics. The fragrant oils released make this a rich sensory experience.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -166,6 +172,7 @@ export const part2 = [
     title: "Grating Cheese",
     description: "The child grates a hard cheese using the large holes of a box grater, developing arm strength and contributing to meal preparation. With proper supervision, this real kitchen task builds competence and confidence.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -193,6 +200,7 @@ export const part2 = [
     title: "Making a Bed",
     description: "The child straightens and pulls up their own blanket and pillow, taking responsibility for their sleeping space. Even an imperfect made bed builds routine, order, and personal pride.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -220,6 +228,7 @@ export const part2 = [
     title: "Stirring Batter",
     description: "The child stirs pancake or muffin batter in a large bowl, using a wooden spoon or silicone spatula, developing wrist rotation and arm coordination. The immediate cooking result gives this activity delicious purpose.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -247,6 +256,7 @@ export const part2 = [
     title: "Carrying Groceries Inside",
     description: "The child carries a small, light bag of groceries from the car or doorstep into the kitchen, developing strength and a sense of family contribution. Being included in everyday errands builds belonging and purposefulness.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 5,
     location: "both",
     materials: [
@@ -272,6 +282,7 @@ export const part2 = [
     title: "Putting Toys Away in Baskets",
     description: "The child returns toys to their designated baskets or shelves at the end of play, learning to complete a full work cycle. Clear labeling or picture cues make this an independent, satisfying task.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -298,6 +309,7 @@ export const part2 = [
     title: "Tearing Lettuce for a Salad",
     description: "The child tears large lettuce leaves into bite-sized pieces for a salad, developing hand strength and contributing to meal preparation. The repetitive tearing motion is satisfying and the task has a delicious outcome.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -324,6 +336,7 @@ export const part2 = [
     title: "Stacking Firewood",
     description: "The child carries small logs or sticks and helps stack them neatly, developing strength, spatial reasoning, and contribution to household tasks. This meaningful outdoor task builds physical confidence.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 15,
     location: "outdoor",
     materials: [
@@ -349,6 +362,7 @@ export const part2 = [
     title: "Spooning Yogurt into a Bowl",
     description: "The child uses a spoon to transfer yogurt from a container into a small bowl, then eats it independently. This self-service breakfast activity develops scooping skills and mealtime independence.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 5,
     location: "indoor",
     materials: [
@@ -376,6 +390,7 @@ export const part2 = [
     title: "Removing Corn Kernels from the Cob",
     description: "The child uses their thumbs to push cooked corn kernels off the cob, using surprising hand strength to complete a real kitchen task. The colorful kernels and satisfying pop make this highly engaging.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -402,6 +417,7 @@ export const part2 = [
     title: "Planting Seeds in Pots",
     description: "The child fills a small pot with soil, makes a hole with a finger, places a seed, and covers it, learning the full cycle of planting. This nurturing activity builds patience, responsibility, and scientific wonder.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 20,
     location: "both",
     materials: [
@@ -430,6 +446,7 @@ export const part2 = [
     title: "Wiping Up Spills",
     description: "The child independently wipes up a spill using a cloth and bucket, then wrings out the cloth, completing a full self-correction cycle. Being equipped to handle spills reduces anxiety and builds resilience.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 5,
     location: "indoor",
     materials: [
@@ -456,6 +473,7 @@ export const part2 = [
     title: "Cutting Herbs with Scissors",
     description: "The child uses child-safe scissors to snip fresh herbs like chives or parsley into a bowl, contributing to meal seasoning. Scissors work is excellent for developing the hand muscles used in writing.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -483,6 +501,7 @@ export const part2 = [
     title: "Ironing Doll Clothes with a Toy Iron",
     description: "The child uses a toy iron or a barely warm real iron (supervised) to smooth small fabric items, learning the concept of care of clothing. This imaginative yet purposeful activity develops fine motor precision.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -510,6 +529,7 @@ export const part2 = [
     title: "Cleaning Paintbrushes After Art",
     description: "The child rinses and reshapes their paintbrushes after painting, developing responsibility for art materials and extending the care of environment principle. This teaches the full cycle of creative work.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 5,
     location: "indoor",
     materials: [
@@ -537,6 +557,7 @@ export const part2 = [
     title: "Separating Egg Whites from Yolks",
     description: "The child helps separate egg whites from yolks by passing the yolk between shell halves over a bowl, learning a fundamental cooking technique. This requires concentration and steady hands.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -563,6 +584,7 @@ export const part2 = [
     title: "Arranging Stones in a Pattern",
     description: "The child collects and arranges small stones in patterns or lines on the ground, developing aesthetic sensibility and mathematical thinking through natural materials. This meditative outdoor activity builds focus and creativity.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 15,
     location: "outdoor",
     materials: [
@@ -588,6 +610,7 @@ export const part2 = [
     title: "Putting On Shoes Independently",
     description: "The child selects the correct left and right shoe and puts them on independently, building dressing skills and spatial awareness. Clear L/R markings inside the shoes can support this learning.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 5,
     location: "both",
     materials: [
@@ -613,6 +636,7 @@ export const part2 = [
     title: "Rinsing Dishes After Washing",
     description: "The child rinses soapy dishes under running water, completing the washing cycle as part of the kitchen clean-up routine. This purposeful water activity builds responsibility and the satisfaction of finishing a job.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -640,6 +664,7 @@ export const part2 = [
     title: "Washing a Doll",
     description: "The child uses a washcloth and soapy water to bathe a doll, practicing the self-care routine and developing nurturing instincts. Role-playing personal hygiene with a doll prepares children for their own bathing independence.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 15,
     location: "indoor",
     materials: [
@@ -668,6 +693,7 @@ export const part2 = [
     title: "Sorting Buttons by Size",
     description: "The child sorts a collection of buttons into small, medium, and large groups, developing visual discrimination and classification skills. The tactile variety of button textures adds a sensory dimension.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -695,6 +721,7 @@ export const part2 = [
     title: "Preparing a Cheese Platter",
     description: "The child arranges crackers, cheese pieces, and fruit on a board to create a snack platter, developing aesthetic arrangement skills and food preparation confidence. This creative task results in a real, shareable snack.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 15,
     location: "indoor",
     materials: [
@@ -723,6 +750,7 @@ export const part2 = [
     title: "Opening and Closing Jars and Lids",
     description: "The child practices twisting open and closing a collection of jars with various lid sizes, developing wrist rotation and hand strength. This practical skill is encountered constantly in daily life.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -749,6 +777,7 @@ export const part2 = [
     title: "Washing a Small Chalkboard",
     description: "The child wets a sponge and wipes a small chalkboard clean, then dries it with a cloth, completing a satisfying transformation. Preparing materials for future use is a key Montessori care-of-environment skill.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 5,
     location: "indoor",
     materials: [
@@ -777,6 +806,7 @@ export const part2 = [
     title: "Using a Can Opener (Supervised)",
     description: "The child helps operate a safety can opener with adult guidance, experiencing a real kitchen tool and participating in meal preparation. This challenging task introduces mechanical understanding and respects the child's capability.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -803,6 +833,7 @@ export const part2 = [
     title: "Rinsing Salad Greens in a Spinner",
     description: "The child places greens in a salad spinner, fills it with water, drains it, and spins the handle to dry the leaves. Operating this kitchen device gives children a sense of technological wonder and genuine food prep participation.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -830,6 +861,7 @@ export const part2 = [
     title: "Pouring Sand from Container to Container",
     description: "The child pours dry sand from one container into another on a tray, developing controlled pouring and concentration. Sand's visual and tactile qualities make this a calming and absorbing activity.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "both",
     materials: [
@@ -857,6 +889,7 @@ export const part2 = [
     title: "Cleaning Up Art Materials",
     description: "The child puts lids on markers, returns pencils to a cup, and wipes the table after art, completing the full cycle of creative work. Caring for art supplies teaches responsibility and prepares the space for next time.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 5,
     location: "indoor",
     materials: [
@@ -884,6 +917,7 @@ export const part2 = [
     title: "Threading Pasta onto String",
     description: "The child threads tube-shaped pasta (rigatoni, penne) onto a piece of string or pipe cleaner, making a pasta necklace and developing fine motor precision. This playful activity uses real materials and builds threading skills.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 15,
     location: "indoor",
     materials: [
@@ -910,6 +944,7 @@ export const part2 = [
     title: "Picking Up Toys with Tongs",
     description: "The child uses kitchen tongs to pick up and sort scattered toys or blocks into containers, turning tidy-up time into a fine motor challenge. This makes cleaning up more engaging while building hand strength.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -937,6 +972,7 @@ export const part2 = [
     title: "Polishing Leaves of a Houseplant",
     description: "The child gently wipes the leaves of a large houseplant with a damp cloth, cleaning them and helping the plant photosynthesize. This delicate care activity builds gentleness and empathy for living things.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -964,6 +1000,7 @@ export const part2 = [
     title: "Unloading the Dishwasher",
     description: "The child takes clean, safe items from the dishwasher and places them in the correct cabinets, contributing to the household rhythm. This real responsibility builds independence and a sense of belonging.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -989,6 +1026,7 @@ export const part2 = [
     title: "Snipping Playdough with Scissors",
     description: "The child cuts playdough snakes into smaller pieces using scissors, practicing cutting skills in a forgiving, self-correcting medium. Playdough's resistance provides the right level of challenge for developing hands.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -1015,6 +1053,7 @@ export const part2 = [
     title: "Wrapping a Gift",
     description: "The child wraps a small box in paper and uses tape and a ribbon, participating in the social ritual of gift-giving. This multi-step task develops sequencing, spatial reasoning, and generous thinking.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 20,
     location: "indoor",
     materials: [
@@ -1043,6 +1082,7 @@ export const part2 = [
     title: "Sewing with a Needle and Thread (Felt)",
     description: "The child pushes a blunt plastic needle through pre-punched holes in felt, creating a simple running stitch. This Montessori sewing activity builds fine motor precision, concentration, and patience.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 20,
     location: "indoor",
     materials: [
@@ -1070,6 +1110,7 @@ export const part2 = [
     title: "Pounding Dough Flat with a Rolling Pin",
     description: "The child uses a small rolling pin to flatten bread or playdough, developing arm strength and an understanding of cause and effect. This satisfying physical task is endlessly repeatable and deeply engaging.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -1097,6 +1138,7 @@ export const part2 = [
     title: "Folding Napkins",
     description: "The child folds cloth napkins into simple rectangles or triangles for the dinner table, developing sequencing skills and contributing to family meals. A folded napkin placed on each plate gives children visible ownership of the table.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -1122,6 +1164,7 @@ export const part2 = [
     title: "Sweeping Up Dry Beans",
     description: "The child sweeps a deliberate scattering of dry beans or seeds into a small dustpan, practicing precise sweeping technique. Using small objects requires more careful control than sweeping larger debris.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -1149,6 +1192,7 @@ export const part2 = [
     title: "Hanging Up a Coat",
     description: "The child takes off their coat and hangs it on a low hook independently, developing self-care and care of belongings. A low hook at the child's height makes this genuinely achievable.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 5,
     location: "indoor",
     materials: [
@@ -1175,6 +1219,7 @@ export const part2 = [
     title: "Sorting Wooden Spoons and Spatulas",
     description: "The child sorts kitchen utensils into correct slots in a utensil holder by shape and type, practicing classification and care of the kitchen environment. This authentic task builds logical organization skills.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 5,
     location: "indoor",
     materials: [
@@ -1201,6 +1246,7 @@ export const part2 = [
     title: "Filling a Water Bottle",
     description: "The child fills their own water bottle at a low sink or dispenser for the day, taking responsibility for their own hydration needs. This simple independence task is deeply meaningful to young children.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 5,
     location: "indoor",
     materials: [
@@ -1227,6 +1273,7 @@ export const part2 = [
     title: "Picking Up Craft Beads with Tweezers",
     description: "The child uses plastic craft tweezers to pick up small beads and sort them into a segmented tray, developing the precise three-finger grip used for writing. This challenge requires high concentration and rewards patience.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 10,
     location: "indoor",
     materials: [
@@ -1254,6 +1301,7 @@ export const part2 = [
     title: "Making Lemonade",
     description: "The child squeezes lemons, measures water and sugar, and stirs the drink together, contributing a whole beverage to the family. This multi-step food preparation activity builds sequencing, measuring, and food science awareness.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 20,
     location: "indoor",
     materials: [
@@ -1283,6 +1331,7 @@ export const part2 = [
     title: "Labeling Containers with Drawings",
     description: "The child draws pictures on labels to mark containers on their shelves, contributing to the organization of their own space. This creative organizational task combines practical life with language and art.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 15,
     location: "indoor",
     materials: [
@@ -1310,6 +1359,7 @@ export const part2 = [
     title: "Caring for a Goldfish",
     description: "The child feeds the fish the correct amount of food, checks the water level, and observes the fish's behavior, developing a daily care routine for a living creature. This responsibility nurtures empathy and scientific observation.",
     category: "practical-life",
+    ageRange: "3-6 years",
     duration: 5,
     location: "indoor",
     materials: [

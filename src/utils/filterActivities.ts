@@ -2,10 +2,13 @@ import { Activity, QuizAnswers } from '../types';
 
 export function filterActivities(activities: Activity[], answers: QuizAnswers): Activity[] {
   return activities.filter((activity) => {
-    if (answers.duration < 999 && activity.duration > answers.duration) {
-      return false;
-    }
+    // Age filter
+    if (activity.ageRange !== answers.ageRange) return false;
 
+    // Duration filter
+    if (answers.duration < 999 && activity.duration > answers.duration) return false;
+
+    // Location filter
     if (answers.location !== 'any') {
       if (
         answers.location !== 'both' &&
@@ -16,6 +19,7 @@ export function filterActivities(activities: Activity[], answers: QuizAnswers): 
       }
     }
 
+    // Materials filter
     if (answers.materials.length > 0) {
       const activityMaterialTypes = activity.materials.map((m) => m.type);
       const hasRequiredMaterials = answers.materials.some((mt) =>
@@ -24,6 +28,7 @@ export function filterActivities(activities: Activity[], answers: QuizAnswers): 
       if (!hasRequiredMaterials) return false;
     }
 
+    // Category filter
     if (answers.categories.length > 0) {
       if (!answers.categories.includes(activity.category)) return false;
     }
