@@ -26,6 +26,14 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": []
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Hearty to access your photos so you can save activity memories.",
+          "cameraPermission": "Allow Hearty to use your camera to capture activity moments."
+        }
+      ]
+    ]
   }
 }
