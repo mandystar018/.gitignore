@@ -5,8 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
-  Dimensions,
-  Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -14,13 +12,9 @@ import { RootStackParamList } from '../types';
 import { colors, spacing, radius, typography } from '../theme';
 import { getAllActivities } from '../data';
 
-const { width, height } = Dimensions.get('window');
-
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, 'Welcome'>;
 };
-
-const FLOATING_EMOJIS = ['🍃', '🌸', '🌻', '🍂', '🌿', '🍀', '🌼', '🍁'];
 
 export default function WelcomeScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
@@ -51,14 +45,6 @@ export default function WelcomeScreen({ navigation }: Props) {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-      <View style={styles.decorTop}>
-        {FLOATING_EMOJIS.slice(0, 4).map((emoji, i) => (
-          <Text key={i} style={[styles.floatingEmoji, { top: 20 + i * 18, left: 30 + i * 55 }]}>
-            {emoji}
-          </Text>
-        ))}
-      </View>
-
       <Animated.View
         style={[
           styles.content,
@@ -85,7 +71,7 @@ export default function WelcomeScreen({ navigation }: Props) {
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statCard}>
-            <Text style={styles.statNumber}>3+</Text>
+            <Text style={styles.statNumber}>0–6</Text>
             <Text style={styles.statLabel}>Years old</Text>
           </View>
         </View>
@@ -116,14 +102,6 @@ export default function WelcomeScreen({ navigation }: Props) {
         </TouchableOpacity>
         <Text style={styles.footerNote}>Based on The Montessori Toddler by Simone Davies</Text>
       </Animated.View>
-
-      <View style={styles.decorBottom}>
-        {FLOATING_EMOJIS.slice(4).map((emoji, i) => (
-          <Text key={i} style={[styles.floatingEmoji, { bottom: 80 + i * 20, right: 20 + i * 50 }]}>
-            {emoji}
-          </Text>
-        ))}
-      </View>
     </View>
   );
 }
@@ -132,27 +110,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-  decorTop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 120,
-    overflow: 'hidden',
-  },
-  decorBottom: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    height: 160,
-    width: 200,
-    overflow: 'hidden',
-  },
-  floatingEmoji: {
-    position: 'absolute',
-    fontSize: 22,
-    opacity: 0.35,
   },
   content: {
     flex: 1,
