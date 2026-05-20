@@ -55,8 +55,8 @@ export default function WelcomeScreen({ navigation }: Props) {
           <View style={styles.logoCircle}>
             <Text style={styles.logoEmoji}>🌱</Text>
           </View>
-          <Text style={styles.appName}>Hearty</Text>
-          <Text style={styles.tagline}>Montessori activities for{'\n'}your little explorer</Text>
+          <Text style={styles.appName}>Montessori{'\n'}Activities</Text>
+          <Text style={styles.tagline}>Inspiring little explorers{'\n'}from birth to 6 years</Text>
         </View>
 
         <View style={styles.statsRow}>
@@ -139,11 +139,13 @@ const styles = StyleSheet.create({
     fontSize: 42,
   },
   appName: {
-    fontSize: 48,
+    fontSize: 38,
     fontWeight: '800',
     color: colors.primary,
-    letterSpacing: -1,
+    letterSpacing: -0.5,
     marginBottom: spacing.sm,
+    textAlign: 'center',
+    lineHeight: 44,
   },
   tagline: {
     ...typography.body,
