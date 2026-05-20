@@ -10,7 +10,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList, ActivityCategory, MaterialType, LocationType, AgeRange } from '../types';
-import { colors, spacing, radius, typography, categoryColors, categoryEmojis, categoryLabels } from '../theme';
+import { colors, spacing, radius, typography } from '../theme';
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, 'Quiz'>;
@@ -85,18 +85,6 @@ const QUESTIONS: QuizQuestion[] = [
       { label: 'Need a store run', value: 'store', emoji: '🛍️' },
     ],
   },
-  {
-    id: 'category',
-    question: 'What would you like to explore?',
-    subtitle: 'Pick one, many, or skip for all activities!',
-    emoji: '🌱',
-    multiSelect: true,
-    options: (Object.keys(categoryLabels) as ActivityCategory[]).map((cat) => ({
-      label: categoryLabels[cat],
-      value: cat,
-      emoji: categoryEmojis[cat],
-    })),
-  },
 ];
 
 export default function QuizScreen({ navigation }: Props) {
@@ -107,7 +95,6 @@ export default function QuizScreen({ navigation }: Props) {
     duration: null,
     location: null,
     materials: [] as MaterialType[],
-    category: [] as ActivityCategory[],
   });
   const progressAnim = useRef(new Animated.Value(1 / QUESTIONS.length)).current;
   const cardAnim = useRef(new Animated.Value(0)).current;
@@ -165,7 +152,7 @@ export default function QuizScreen({ navigation }: Props) {
           duration: answers.duration ?? 999,
           location: (answers.location ?? 'any') as LocationType | 'any',
           materials: (answers.materials ?? []) as MaterialType[],
-          categories: (answers.category ?? []) as ActivityCategory[],
+          categories: [] as ActivityCategory[],
         },
       });
     }
@@ -191,7 +178,7 @@ export default function QuizScreen({ navigation }: Props) {
           duration: answers.duration ?? 999,
           location: (answers.location ?? 'any') as LocationType | 'any',
           materials: (answers.materials ?? []) as MaterialType[],
-          categories: (answers.category ?? []) as ActivityCategory[],
+          categories: [] as ActivityCategory[],
         },
       });
     }
