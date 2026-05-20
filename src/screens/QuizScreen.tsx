@@ -73,18 +73,6 @@ const QUESTIONS: QuizQuestion[] = [
       { label: 'Either works!', value: 'any', emoji: '✨' },
     ],
   },
-  {
-    id: 'materials',
-    question: 'What materials are around?',
-    subtitle: 'Pick all that apply — or skip to see everything!',
-    emoji: '🧺',
-    multiSelect: true,
-    options: [
-      { label: 'Household items', value: 'household', emoji: '🏡' },
-      { label: 'Nature & natural', value: 'natural', emoji: '🍃' },
-      { label: 'Need a store run', value: 'store', emoji: '🛍️' },
-    ],
-  },
 ];
 
 export default function QuizScreen({ navigation }: Props) {
@@ -94,7 +82,6 @@ export default function QuizScreen({ navigation }: Props) {
     ageRange: null,
     duration: null,
     location: null,
-    materials: [] as MaterialType[],
   });
   const progressAnim = useRef(new Animated.Value(1 / QUESTIONS.length)).current;
   const cardAnim = useRef(new Animated.Value(0)).current;
@@ -151,7 +138,7 @@ export default function QuizScreen({ navigation }: Props) {
           ageRange: (answers.ageRange ?? '3-6 years') as AgeRange,
           duration: answers.duration ?? 999,
           location: (answers.location ?? 'any') as LocationType | 'any',
-          materials: (answers.materials ?? []) as MaterialType[],
+          materials: [] as MaterialType[],
           categories: [] as ActivityCategory[],
         },
       });
@@ -177,7 +164,7 @@ export default function QuizScreen({ navigation }: Props) {
           ageRange: (answers.ageRange ?? '3-6 years') as AgeRange,
           duration: answers.duration ?? 999,
           location: (answers.location ?? 'any') as LocationType | 'any',
-          materials: (answers.materials ?? []) as MaterialType[],
+          materials: [] as MaterialType[],
           categories: [] as ActivityCategory[],
         },
       });
