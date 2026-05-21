@@ -1,3 +1,14 @@
 node_modules/
 .DS_Store
 dist/
+.expo/
+.expo-shared/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+ios/
+android/
