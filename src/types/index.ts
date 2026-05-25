@@ -49,53 +49,9 @@ export interface QuizAnswers {
   categories: ActivityCategory[];
 }
 
-// SEO Edge types
-export type KeywordStatus = 'ranking' | 'improving' | 'needs-work' | 'tracking';
-
-export type KeywordCategory =
-  | 'portrait'
-  | 'wedding'
-  | 'family'
-  | 'newborn'
-  | 'event'
-  | 'general'
-  | 'editing'
-  | 'business'
-  | 'custom';
-
-export interface RankEntry {
-  date: string;
-  rank: number;
-}
-
-export interface TrackedKeyword {
-  id: string;
-  keyword: string;
-  category: KeywordCategory;
-  status: KeywordStatus;
-  currentRank?: number;
-  rankHistory: RankEntry[];
-  lastChecked?: string;
-  lastCheckError?: string;
-  notes: string;
-  dateAdded: string;
-  lastUpdated: string;
-}
-
-export interface ContentAnalysisResult {
-  score: number;
-  wordCount: number;
-  keywordsFound: { keyword: string; count: number; density: number }[];
-  recommendations: string[];
-  topKeyword: string | null;
-}
-
 export type RootStackParamList = {
   Welcome: undefined;
   Quiz: undefined;
   Activities: { answers: QuizAnswers };
   ActivityDetail: { activity: Activity };
-  SEOHome: undefined;
-  KeywordTracker: undefined;
-  ContentAnalysis: undefined;
 };
