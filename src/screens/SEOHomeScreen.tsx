@@ -9,12 +9,14 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  Modal,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList, TrackedKeyword } from '../types';
-import { loadKeywords, loadWebsiteUrl, saveWebsiteUrl, getStatusColor } from '../utils/seoUtils';
+import { loadKeywords, loadWebsiteUrl, saveWebsiteUrl, getStatusColor, formatLastChecked } from '../utils/seoUtils';
+import { loadSerpApiKey, saveSerpApiKey } from '../utils/serpApi';
 import { colors, spacing, radius, typography } from '../theme';
 
 type Nav = StackNavigationProp<RootStackParamList, 'SEOHome'>;
@@ -23,13 +25,17 @@ export default function SEOHomeScreen() {
   const navigation = useNavigation<Nav>();
   const [keywords, setKeywords] = useState<TrackedKeyword[]>([]);
   const [websiteUrl, setWebsiteUrl] = useState('');
+  const [apiKey, setApiKey] = useState('');
   const [editingUrl, setEditingUrl] = useState(false);
   const [urlDraft, setUrlDraft] = useState('');
+  const [showApiModal, setShowApiModal] = useState(false);
+  const [apiKeyDraft, setApiKeyDraft] = useState('');
 
   useFocusEffect(
     useCallback(() => {
       loadKeywords().then(setKeywords);
       loadWebsiteUrl().then(url => { setWebsiteUrl(url); setUrlDraft(url); });
+      loadSerpApiKey().then(k => { setApiKey(k); setApiKeyDraft(k); });
     }, [])
   );
 
@@ -40,8 +46,13 @@ export default function SEOHomeScreen() {
     setEditingUrl(false);
   }
 
+  async function handleSaveApiKey() {
+    await saveSerpApiKey(apiKeyDraft.trim());
+    setApiKey(apiKeyDraft.trim());
+    setShowApiModal(false);
+  }
+
   const rankingCount = keywords.filter(k => k.status === 'ranking').length;
-  const needsWorkCount = keywords.filter(k => k.status === 'needs-work').length;
   const improvingCount = keywords.filter(k => k.status === 'improving').length;
   const rankedKeywords = keywords.filter(k => k.currentRank !== undefined);
   const avgRank = rankedKeywords.length > 0
@@ -52,31 +63,101 @@ export default function SEOHomeScreen() {
     .sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime())
     .slice(0, 5);
 
+  const liveTrackingReady = !!apiKey && !!websiteUrl;
+
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
           {/* Header */}
           <View style={styles.header}>
             <View>
               <Text style={styles.title}>SEO Edge</Text>
               <Text style={styles.subtitle}>Keyword Rank Tracker</Text>
             </View>
-            <View style={styles.cameraIcon}>
-              <Ionicons name="trending-up" size={28} color={colors.primary} />
+            <View style={[styles.liveBadge, liveTrackingReady ? styles.liveBadgeOn : styles.liveBadgeOff]}>
+              <View style={[styles.liveDot, { backgroundColor: liveTrackingReady ? '#5B8A5B' : colors.textLight }]} />
+              <Text style={[styles.liveText, { color: liveTrackingReady ? '#5B8A5B' : colors.textLight }]}>
+                {liveTrackingReady ? 'Live' : 'Manual'}
+              </Text>
             </View>
           </View>
 
-          {/* Website URL */}
-          <View style={styles.urlCard}>
-            <View style={styles.urlHeader}>
-              <Ionicons name="globe" size={16} color={colors.primary} />
-              <Text style={styles.urlTitle}>Your Website</Text>
-              <TouchableOpacity onPress={() => setEditingUrl(!editingUrl)}>
-                <Text style={styles.urlEdit}>{editingUrl ? 'Cancel' : 'Edit'}</Text>
+          {/* Setup cards — shown when not fully configured */}
+          {(!websiteUrl || !apiKey) && (
+            <View style={styles.setupSection}>
+              <Text style={styles.setupTitle}>Quick Setup</Text>
+
+              {/* Website URL */}
+              <TouchableOpacity
+                style={[styles.setupCard, websiteUrl && styles.setupCardDone]}
+                onPress={() => setEditingUrl(true)}
+              >
+                <View style={[styles.setupIcon, websiteUrl && { backgroundColor: '#E5EDE4' }]}>
+                  <Ionicons name="globe" size={20} color={websiteUrl ? '#5B8A5B' : colors.primary} />
+                </View>
+                <View style={styles.setupCardBody}>
+                  <Text style={styles.setupCardTitle}>
+                    {websiteUrl ? 'Website URL saved' : 'Add your website URL'}
+                  </Text>
+                  <Text style={styles.setupCardSub}>
+                    {websiteUrl || 'e.g. https://yourwebsite.com'}
+                  </Text>
+                </View>
+                <Ionicons
+                  name={websiteUrl ? 'checkmark-circle' : 'chevron-forward'}
+                  size={20}
+                  color={websiteUrl ? '#5B8A5B' : colors.textLight}
+                />
+              </TouchableOpacity>
+
+              {/* API Key */}
+              <TouchableOpacity
+                style={[styles.setupCard, apiKey && styles.setupCardDone]}
+                onPress={() => setShowApiModal(true)}
+              >
+                <View style={[styles.setupIcon, apiKey && { backgroundColor: '#E5EDE4' }]}>
+                  <Ionicons name="key" size={20} color={apiKey ? '#5B8A5B' : colors.primary} />
+                </View>
+                <View style={styles.setupCardBody}>
+                  <Text style={styles.setupCardTitle}>
+                    {apiKey ? 'SerpApi key saved' : 'Add SerpApi key'}
+                  </Text>
+                  <Text style={styles.setupCardSub}>
+                    {apiKey ? 'Live rank tracking enabled' : 'Free at serpapi.com — 100 searches/month'}
+                  </Text>
+                </View>
+                <Ionicons
+                  name={apiKey ? 'checkmark-circle' : 'chevron-forward'}
+                  size={20}
+                  color={apiKey ? '#5B8A5B' : colors.textLight}
+                />
               </TouchableOpacity>
             </View>
-            {editingUrl ? (
+          )}
+
+          {/* Configured: compact website + settings row */}
+          {websiteUrl && apiKey && (
+            <View style={styles.configRow}>
+              <View style={styles.configSite}>
+                <Ionicons name="globe" size={14} color={colors.textMedium} />
+                <Text style={styles.configSiteText} numberOfLines={1}>{websiteUrl}</Text>
+              </View>
+              <TouchableOpacity onPress={() => setShowApiModal(true)} style={styles.configSettingsBtn}>
+                <Ionicons name="settings-outline" size={18} color={colors.textMedium} />
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Website URL edit inline (for setup card tap) */}
+          {editingUrl && (
+            <View style={styles.urlInputCard}>
+              <Text style={styles.urlInputLabel}>Your website URL</Text>
               <View style={styles.urlInputRow}>
                 <TextInput
                   style={styles.urlInput}
@@ -92,12 +173,11 @@ export default function SEOHomeScreen() {
                   <Text style={styles.urlSaveBtnText}>Save</Text>
                 </TouchableOpacity>
               </View>
-            ) : (
-              <Text style={websiteUrl ? styles.urlValue : styles.urlPlaceholder}>
-                {websiteUrl || 'Tap Edit to add your website URL'}
-              </Text>
-            )}
-          </View>
+              <TouchableOpacity onPress={() => setEditingUrl(false)}>
+                <Text style={styles.cancelLink}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           {/* Stats Row */}
           <View style={styles.statsRow}>
@@ -129,9 +209,11 @@ export default function SEOHomeScreen() {
               onPress={() => navigation.navigate('KeywordTracker')}
               activeOpacity={0.8}
             >
-              <Ionicons name="key" size={32} color={colors.primary} />
-              <Text style={styles.actionTitle}>Keyword{`\n`}Tracker</Text>
-              <Text style={styles.actionSub}>Track rankings for{`\n`}any keyword</Text>
+              <Ionicons name="trending-up" size={32} color={colors.primary} />
+              <Text style={styles.actionTitle}>Keyword{'\n'}Tracker</Text>
+              <Text style={styles.actionSub}>
+                {liveTrackingReady ? 'Live Google rankings' : 'Track any keyword'}
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -140,8 +222,8 @@ export default function SEOHomeScreen() {
               activeOpacity={0.8}
             >
               <Ionicons name="document-text" size={32} color="#5B8A5B" />
-              <Text style={[styles.actionTitle, { color: '#5B8A5B' }]}>Content{`\n`}Analyzer</Text>
-              <Text style={styles.actionSub}>Score your blog{`\n`}posts for SEO</Text>
+              <Text style={[styles.actionTitle, { color: '#5B8A5B' }]}>Content{'\n'}Analyzer</Text>
+              <Text style={styles.actionSub}>Score blog posts{'\n'}for SEO</Text>
             </TouchableOpacity>
           </View>
 
@@ -158,13 +240,16 @@ export default function SEOHomeScreen() {
                 {recent.map(kw => (
                   <View key={kw.id} style={styles.recentItem}>
                     <View style={[styles.statusDot, { backgroundColor: getStatusColor(kw.status) }]} />
-                    <Text style={styles.recentKeyword} numberOfLines={1}>{kw.keyword}</Text>
+                    <View style={styles.recentBody}>
+                      <Text style={styles.recentKeyword} numberOfLines={1}>{kw.keyword}</Text>
+                      <Text style={styles.recentChecked}>{formatLastChecked(kw.lastChecked)}</Text>
+                    </View>
                     {kw.currentRank !== undefined ? (
                       <View style={styles.rankBadge}>
                         <Text style={styles.rankBadgeText}>#{kw.currentRank}</Text>
                       </View>
                     ) : (
-                      <Text style={styles.noRankText}>No rank</Text>
+                      <Text style={styles.noRankText}>—</Text>
                     )}
                   </View>
                 ))}
@@ -177,26 +262,83 @@ export default function SEOHomeScreen() {
             <View style={styles.emptyState}>
               <Ionicons name="search" size={48} color={colors.textLight} />
               <Text style={styles.emptyTitle}>No keywords yet</Text>
-              <Text style={styles.emptyText}>Add any keyword from your website or blog to start tracking its Google ranking.</Text>
-              <TouchableOpacity
-                style={styles.emptyBtn}
-                onPress={() => navigation.navigate('KeywordTracker')}
-              >
+              <Text style={styles.emptyText}>
+                Add any keyword from your website or blog — the app will check your Google ranking automatically.
+              </Text>
+              <TouchableOpacity style={styles.emptyBtn} onPress={() => navigation.navigate('KeywordTracker')}>
                 <Text style={styles.emptyBtnText}>Add Keywords</Text>
               </TouchableOpacity>
             </View>
           )}
-
-          {/* Tip card */}
-          <View style={styles.tipCard}>
-            <Ionicons name="bulb" size={18} color={colors.accent} />
-            <Text style={styles.tipText}>
-              <Text style={{ fontWeight: '600' }}>Tip: </Text>
-              After searching Google for your keyword, count which page/position your site appears at and log it in the Keyword Tracker.
-            </Text>
-          </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* API Key Modal */}
+      <Modal visible={showApiModal} transparent animationType="slide">
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalSheet}>
+              <Text style={styles.modalTitle}>Live Rank Tracking</Text>
+              <Text style={styles.modalBody}>
+                Enter your SerpApi key to enable automatic Google rank checking. Sign up free at serpapi.com — includes 100 searches/month at no cost.
+              </Text>
+
+              <Text style={styles.modalLabel}>SerpApi Key</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={apiKeyDraft}
+                onChangeText={setApiKeyDraft}
+                placeholder="Paste your API key here"
+                placeholderTextColor={colors.textLight}
+                autoCapitalize="none"
+                autoCorrect={false}
+                secureTextEntry={false}
+              />
+
+              {websiteUrl ? null : (
+                <>
+                  <Text style={styles.modalLabel}>Website URL</Text>
+                  <TextInput
+                    style={styles.modalInput}
+                    value={urlDraft}
+                    onChangeText={setUrlDraft}
+                    placeholder="https://yourwebsite.com"
+                    placeholderTextColor={colors.textLight}
+                    autoCapitalize="none"
+                    keyboardType="url"
+                  />
+                </>
+              )}
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  style={styles.cancelBtn}
+                  onPress={() => { setShowApiModal(false); setApiKeyDraft(apiKey); }}
+                >
+                  <Text style={styles.cancelBtnText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.saveBtn} onPress={handleSaveApiKey}>
+                  <Text style={styles.saveBtnText}>Save</Text>
+                </TouchableOpacity>
+              </View>
+
+              {apiKey && (
+                <TouchableOpacity
+                  style={styles.removeKeyBtn}
+                  onPress={async () => {
+                    await saveSerpApiKey('');
+                    setApiKey('');
+                    setApiKeyDraft('');
+                    setShowApiModal(false);
+                  }}
+                >
+                  <Text style={styles.removeKeyText}>Remove API key (switch to manual)</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -204,37 +346,70 @@ export default function SEOHomeScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   scroll: { flex: 1 },
-  content: { padding: spacing.lg, paddingBottom: spacing.xxl },
+  content: { padding: spacing.lg, paddingBottom: spacing.xxl, gap: spacing.md },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.lg,
   },
   title: { ...typography.h1, fontSize: 28 },
   subtitle: { ...typography.bodySmall, marginTop: 2 },
-  cameraIcon: {
-    width: 52,
-    height: 52,
+  liveBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
     borderRadius: radius.full,
+  },
+  liveBadgeOn: { backgroundColor: '#E5EDE4' },
+  liveBadgeOff: { backgroundColor: colors.border },
+  liveDot: { width: 7, height: 7, borderRadius: 4 },
+  liveText: { fontSize: 12, fontWeight: '700' },
+  setupSection: { gap: spacing.sm },
+  setupTitle: { ...typography.label, marginBottom: spacing.xs },
+  setupCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    gap: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  setupCardDone: { borderColor: '#A8C8A2', backgroundColor: '#F8FDF8' },
+  setupIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
     backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  urlCard: {
+  setupCardBody: { flex: 1 },
+  setupCardTitle: { ...typography.body, fontWeight: '600', color: colors.textDark },
+  setupCardSub: { ...typography.bodySmall, marginTop: 2 },
+  configRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E5EDE4',
+    borderRadius: radius.md,
+    padding: spacing.sm,
+    gap: spacing.sm,
+  },
+  configSite: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  configSiteText: { ...typography.bodySmall, color: colors.textMedium, flex: 1 },
+  configSettingsBtn: { padding: spacing.xs },
+  urlInputCard: {
     backgroundColor: colors.surface,
     borderRadius: radius.md,
     padding: spacing.md,
-    marginBottom: spacing.md,
+    gap: spacing.sm,
     borderWidth: 1,
     borderColor: colors.border,
-    gap: spacing.xs,
   },
-  urlHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  urlTitle: { ...typography.label, flex: 1, color: colors.textMedium },
-  urlEdit: { ...typography.bodySmall, color: colors.primary, fontWeight: '600' },
-  urlValue: { ...typography.body, color: colors.textDark, fontWeight: '500' },
-  urlPlaceholder: { ...typography.bodySmall, color: colors.textLight, fontStyle: 'italic' },
+  urlInputLabel: { ...typography.label },
   urlInputRow: { flexDirection: 'row', gap: spacing.sm, alignItems: 'center' },
   urlInput: {
     flex: 1,
@@ -253,11 +428,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
   },
   urlSaveBtnText: { color: colors.white, fontWeight: '600', fontSize: 14 },
-  statsRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginBottom: spacing.lg,
-  },
+  cancelLink: { ...typography.bodySmall, color: colors.textLight, textAlign: 'center' },
+  statsRow: { flexDirection: 'row', gap: spacing.sm },
   statCard: {
     flex: 1,
     backgroundColor: colors.surface,
@@ -272,16 +444,10 @@ const styles = StyleSheet.create({
   },
   statNumber: { ...typography.h2, fontSize: 20, color: colors.textDark },
   statLabel: { ...typography.label, fontSize: 10, marginTop: 2, textAlign: 'center' },
-  sectionTitle: { ...typography.h4, marginBottom: spacing.md },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-    marginTop: spacing.lg,
-  },
+  sectionTitle: { ...typography.h4 },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   seeAll: { ...typography.bodySmall, color: colors.primary, fontWeight: '600' },
-  actionsRow: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.lg },
+  actionsRow: { flexDirection: 'row', gap: spacing.md },
   actionCard: { flex: 1, borderRadius: radius.lg, padding: spacing.md, gap: spacing.sm },
   actionTitle: { ...typography.h4, color: colors.primary },
   actionSub: { ...typography.bodySmall, lineHeight: 18 },
@@ -304,7 +470,9 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   statusDot: { width: 8, height: 8, borderRadius: 4, flexShrink: 0 },
-  recentKeyword: { ...typography.body, flex: 1, fontWeight: '500', color: colors.textDark },
+  recentBody: { flex: 1 },
+  recentKeyword: { ...typography.body, fontWeight: '500', color: colors.textDark },
+  recentChecked: { ...typography.bodySmall, fontSize: 11, marginTop: 1 },
   rankBadge: {
     backgroundColor: colors.primaryLight,
     paddingHorizontal: spacing.sm,
@@ -324,14 +492,38 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
   },
   emptyBtnText: { color: colors.white, fontWeight: '600', fontSize: 15 },
-  tipCard: {
-    flexDirection: 'row',
-    backgroundColor: colors.accentLight,
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
+  modalSheet: {
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
+    padding: spacing.lg,
+    paddingBottom: spacing.xxl,
+    gap: spacing.sm,
+  },
+  modalTitle: { ...typography.h3 },
+  modalBody: { ...typography.body, color: colors.textMedium, lineHeight: 22 },
+  modalLabel: { ...typography.label, marginTop: spacing.xs },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: radius.md,
     padding: spacing.md,
-    gap: spacing.sm,
-    marginTop: spacing.lg,
-    alignItems: 'flex-start',
+    ...typography.body,
+    color: colors.textDark,
   },
-  tipText: { ...typography.bodySmall, flex: 1, lineHeight: 20, color: colors.textMedium },
+  modalActions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.xs },
+  cancelBtn: {
+    flex: 1,
+    padding: spacing.md,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+  },
+  cancelBtnText: { ...typography.body, fontWeight: '600', color: colors.textMedium },
+  saveBtn: { flex: 1, padding: spacing.md, borderRadius: radius.md, backgroundColor: colors.primary, alignItems: 'center' },
+  saveBtnText: { ...typography.body, fontWeight: '600', color: colors.white },
+  removeKeyBtn: { alignItems: 'center', paddingTop: spacing.xs },
+  removeKeyText: { ...typography.bodySmall, color: '#D44533' },
 });

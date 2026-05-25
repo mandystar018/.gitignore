@@ -57,13 +57,17 @@ export async function addKeyword(
   return newKeyword;
 }
 
-export async function updateKeywordRank(id: string, rank: number): Promise<void> {
+export async function updateKeywordRank(
+  id: string,
+  rank: number,
+  source: 'manual' | 'auto' = 'manual'
+): Promise<void> {
   const keywords = await loadKeywords();
+  const now = new Date().toISOString();
   const updated = keywords.map(k => {
     if (k.id !== id) return k;
-    const newEntry: RankEntry = { date: new Date().toISOString(), rank };
-    const history = [...(k.rankHistory || []), newEntry].slice(-30); // keep last 30 entries
-    // Auto-set status based on rank
+    const newEntry: RankEntry = { date: now, rank };
+    const history = [...(k.rankHistory || []), newEntry].slice(-30);
     let status: KeywordStatus = k.status;
     if (rank <= 10) status = 'ranking';
     else if (rank <= 20) status = 'improving';
@@ -73,10 +77,35 @@ export async function updateKeywordRank(id: string, rank: number): Promise<void>
       currentRank: rank,
       rankHistory: history,
       status,
-      lastUpdated: new Date().toISOString(),
+      lastChecked: now,
+      lastCheckError: undefined,
+      lastUpdated: now,
     };
   });
   await saveKeywords(updated);
+}
+
+export async function markKeywordChecked(
+  id: string,
+  error: string
+): Promise<void> {
+  const keywords = await loadKeywords();
+  const now = new Date().toISOString();
+  const updated = keywords.map(k =>
+    k.id === id ? { ...k, lastChecked: now, lastCheckError: error } : k
+  );
+  await saveKeywords(updated);
+}
+
+export function formatLastChecked(iso?: string): string {
+  if (!iso) return 'Never checked';
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
 }
 
 export async function updateKeyword(id: string, updates: Partial<TrackedKeyword>): Promise<void> {

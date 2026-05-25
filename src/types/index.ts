@@ -75,6 +75,8 @@ export interface TrackedKeyword {
   status: KeywordStatus;
   currentRank?: number;
   rankHistory: RankEntry[];
+  lastChecked?: string;
+  lastCheckError?: string;
   notes: string;
   dateAdded: string;
   lastUpdated: string;
