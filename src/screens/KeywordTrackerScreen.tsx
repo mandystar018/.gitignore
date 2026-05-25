@@ -10,40 +10,51 @@ import {
   ScrollView,
   SafeAreaView,
   Alert,
+  Linking,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { TrackedKeyword, KeywordStatus, KeywordCategory } from '../types';
+import { TrackedKeyword, KeywordStatus } from '../types';
 import {
   loadKeywords,
+  loadWebsiteUrl,
   addKeyword,
   updateKeyword,
+  updateKeywordRank,
   deleteKeyword,
   getStatusColor,
   getStatusLabel,
+  getRankTrend,
+  getRankChange,
+  buildGoogleSearchUrl,
 } from '../utils/seoUtils';
-import { photographyKeywords, categoryLabels, categoryColors } from '../data/photographyKeywords';
 import { colors, spacing, radius, typography } from '../theme';
 
-const STATUS_OPTIONS: KeywordStatus[] = ['tracking', 'improving', 'ranking', 'needs-work'];
 const FILTER_OPTIONS: (KeywordStatus | 'all')[] = ['all', 'ranking', 'improving', 'needs-work', 'tracking'];
 
 export default function KeywordTrackerScreen() {
   const navigation = useNavigation();
   const [keywords, setKeywords] = useState<TrackedKeyword[]>([]);
+  const [websiteUrl, setWebsiteUrl] = useState('');
   const [filter, setFilter] = useState<KeywordStatus | 'all'>('all');
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editTarget, setEditTarget] = useState<TrackedKeyword | null>(null);
-  const [newKeyword, setNewKeyword] = useState('');
-  const [newStatus, setNewStatus] = useState<KeywordStatus>('tracking');
-  const [newCategory, setNewCategory] = useState<KeywordCategory>('general');
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Add modal
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newKeyword, setNewKeyword] = useState('');
+  const [newRank, setNewRank] = useState('');
+
+  // Update rank modal
+  const [showRankModal, setShowRankModal] = useState(false);
+  const [rankTarget, setRankTarget] = useState<TrackedKeyword | null>(null);
+  const [rankInput, setRankInput] = useState('');
 
   useFocusEffect(
     useCallback(() => {
       loadKeywords().then(setKeywords);
+      loadWebsiteUrl().then(setWebsiteUrl);
     }, [])
   );
 
@@ -55,23 +66,35 @@ export default function KeywordTrackerScreen() {
 
   async function handleAdd() {
     if (!newKeyword.trim()) return;
-    const added = await addKeyword(newKeyword.trim(), newCategory, newStatus);
+    const rank = newRank.trim() ? parseInt(newRank.trim(), 10) : undefined;
+    const added = await addKeyword(
+      newKeyword.trim(),
+      'custom',
+      rank && rank <= 10 ? 'ranking' : rank && rank <= 20 ? 'improving' : rank ? 'needs-work' : 'tracking',
+      '',
+      rank && !isNaN(rank) ? rank : undefined
+    );
     setKeywords(prev => [...prev, added]);
     setNewKeyword('');
-    setNewStatus('tracking');
-    setNewCategory('general');
+    setNewRank('');
     setShowAddModal(false);
   }
 
-  async function handleAddSuggestion(keyword: string, category: KeywordCategory) {
-    if (keywords.some(k => k.keyword.toLowerCase() === keyword.toLowerCase())) return;
-    const added = await addKeyword(keyword, category);
-    setKeywords(prev => [...prev, added]);
+  function openRankModal(kw: TrackedKeyword) {
+    setRankTarget(kw);
+    setRankInput(kw.currentRank?.toString() ?? '');
+    setShowRankModal(true);
   }
 
-  async function handleUpdateStatus(id: string, status: KeywordStatus) {
-    await updateKeyword(id, { status });
-    setKeywords(prev => prev.map(k => k.id === id ? { ...k, status } : k));
+  async function handleSaveRank() {
+    if (!rankTarget) return;
+    const rank = parseInt(rankInput, 10);
+    if (isNaN(rank) || rank < 1) return;
+    await updateKeywordRank(rankTarget.id, rank);
+    const updated = await loadKeywords();
+    setKeywords(updated);
+    setShowRankModal(false);
+    setRankTarget(null);
   }
 
   async function handleDelete(id: string) {
@@ -86,46 +109,78 @@ export default function KeywordTrackerScreen() {
     ]);
   }
 
-  function handleEditOpen(kw: TrackedKeyword) {
-    setEditTarget(kw);
-    setNewStatus(kw.status);
-    setShowEditModal(true);
+  function handleCheckOnGoogle(kw: TrackedKeyword) {
+    const url = buildGoogleSearchUrl(kw.keyword, websiteUrl);
+    Linking.openURL(url);
   }
 
-  async function handleEditSave() {
-    if (!editTarget) return;
-    await updateKeyword(editTarget.id, { status: newStatus });
-    setKeywords(prev => prev.map(k => k.id === editTarget.id ? { ...k, status: newStatus } : k));
-    setShowEditModal(false);
-    setEditTarget(null);
+  function renderTrendIcon(kw: TrackedKeyword) {
+    const trend = getRankTrend(kw.rankHistory);
+    const change = getRankChange(kw.rankHistory);
+    if (trend === 'new') return null;
+    if (trend === 'up') return (
+      <View style={styles.trendUp}>
+        <Ionicons name="arrow-up" size={12} color="#5B8A5B" />
+        <Text style={styles.trendUpText}>+{change}</Text>
+      </View>
+    );
+    if (trend === 'down') return (
+      <View style={styles.trendDown}>
+        <Ionicons name="arrow-down" size={12} color="#D44533" />
+        <Text style={styles.trendDownText}>{change}</Text>
+      </View>
+    );
+    return <Text style={styles.trendSame}>—</Text>;
   }
-
-  const alreadyTracked = new Set(keywords.map(k => k.keyword.toLowerCase()));
-  const availableSuggestions = photographyKeywords.filter(
-    s => !alreadyTracked.has(s.keyword.toLowerCase())
-  );
 
   function renderKeyword({ item }: { item: TrackedKeyword }) {
     return (
       <View style={styles.keywordCard}>
         <View style={[styles.statusBar, { backgroundColor: getStatusColor(item.status) }]} />
         <View style={styles.keywordBody}>
+          {/* Top row: keyword + rank */}
           <View style={styles.keywordTop}>
-            <Text style={styles.keywordText}>{item.keyword}</Text>
+            <Text style={styles.keywordText} numberOfLines={2}>{item.keyword}</Text>
+            <View style={styles.rankArea}>
+              {item.currentRank !== undefined ? (
+                <>
+                  <Text style={[styles.rankNumber, { color: getStatusColor(item.status) }]}>
+                    #{item.currentRank}
+                  </Text>
+                  {renderTrendIcon(item)}
+                </>
+              ) : (
+                <Text style={styles.noRank}>Not logged</Text>
+              )}
+            </View>
+          </View>
+
+          {/* Status badge */}
+          <View style={styles.statusRow}>
             <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '22' }]}>
               <Text style={[styles.statusBadgeText, { color: getStatusColor(item.status) }]}>
                 {getStatusLabel(item.status)}
               </Text>
             </View>
+            {item.rankHistory.length > 1 && (
+              <Text style={styles.historyNote}>
+                {item.rankHistory.length} rank entries
+              </Text>
+            )}
           </View>
-          <Text style={styles.categoryText}>{categoryLabels[item.category]}</Text>
+
+          {/* Actions */}
           <View style={styles.keywordActions}>
-            <TouchableOpacity style={styles.actionBtn} onPress={() => handleEditOpen(item)}>
-              <Ionicons name="pencil" size={14} color={colors.textMedium} />
-              <Text style={styles.actionBtnText}>Edit status</Text>
+            <TouchableOpacity style={styles.actionBtn} onPress={() => openRankModal(item)}>
+              <Ionicons name="podium" size={13} color={colors.primary} />
+              <Text style={[styles.actionBtnText, { color: colors.primary }]}>Log rank</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionBtn} onPress={() => handleCheckOnGoogle(item)}>
+              <Ionicons name="search" size={13} color={colors.textMedium} />
+              <Text style={styles.actionBtnText}>Check Google</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionBtn} onPress={() => handleDelete(item.id)}>
-              <Ionicons name="trash" size={14} color="#D44533" />
+              <Ionicons name="trash" size={13} color="#D44533" />
               <Text style={[styles.actionBtnText, { color: '#D44533' }]}>Remove</Text>
             </TouchableOpacity>
           </View>
@@ -147,19 +202,19 @@ export default function KeywordTrackerScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Search */}
+      {/* Search bar */}
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={16} color={colors.textLight} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search keywords..."
+          placeholder="Search your keywords..."
           placeholderTextColor={colors.textLight}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
       </View>
 
-      {/* Filter Tabs */}
+      {/* Filter tabs */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -173,14 +228,13 @@ export default function KeywordTrackerScreen() {
             onPress={() => setFilter(f)}
           >
             <Text style={[styles.filterTabText, filter === f && styles.filterTabTextActive]}>
-              {f === 'all' ? 'All' : getStatusLabel(f)}
-              {f !== 'all' && ` (${keywords.filter(k => k.status === f).length})`}
+              {f === 'all' ? `All (${keywords.length})` : `${getStatusLabel(f)} (${keywords.filter(k => k.status === f).length})`}
             </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
-      {/* Keyword List */}
+      {/* Keyword list */}
       <FlatList
         data={filtered}
         renderItem={renderKeyword}
@@ -191,142 +245,127 @@ export default function KeywordTrackerScreen() {
             <Ionicons name="key-outline" size={40} color={colors.textLight} />
             <Text style={styles.emptyText}>
               {keywords.length === 0
-                ? 'No keywords yet. Tap + to add your first keyword or browse suggestions below.'
+                ? 'No keywords yet. Tap + to add any keyword from your website or blog.'
                 : 'No keywords match this filter.'}
             </Text>
-          </View>
-        }
-        ListFooterComponent={
-          availableSuggestions.length > 0 ? (
-            <View style={styles.suggestionsSection}>
-              <TouchableOpacity
-                style={styles.suggestionsToggle}
-                onPress={() => setShowSuggestions(!showSuggestions)}
-              >
-                <Text style={styles.suggestionsToggleText}>Photography keyword suggestions</Text>
-                <Ionicons
-                  name={showSuggestions ? 'chevron-up' : 'chevron-down'}
-                  size={18}
-                  color={colors.primary}
-                />
+            {keywords.length === 0 && (
+              <TouchableOpacity style={styles.emptyAddBtn} onPress={() => setShowAddModal(true)}>
+                <Text style={styles.emptyAddBtnText}>+ Add First Keyword</Text>
               </TouchableOpacity>
-              {showSuggestions && (
-                <View style={styles.suggestionsList}>
-                  {availableSuggestions.map(s => (
-                    <TouchableOpacity
-                      key={s.keyword}
-                      style={styles.suggestionItem}
-                      onPress={() => handleAddSuggestion(s.keyword, s.category)}
-                    >
-                      <View>
-                        <Text style={styles.suggestionKeyword}>{s.keyword}</Text>
-                        <Text style={styles.suggestionDesc}>{s.description}</Text>
-                      </View>
-                      <View style={[styles.categoryPill, { backgroundColor: categoryColors[s.category] + '22' }]}>
-                        <Text style={[styles.categoryPillText, { color: categoryColors[s.category] }]}>
-                          {categoryLabels[s.category]}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            </View>
-          ) : null
+            )}
+          </View>
         }
       />
 
-      {/* Add Modal */}
+      {/* Add Keyword Modal */}
       <Modal visible={showAddModal} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalSheet}>
-            <Text style={styles.modalTitle}>Add Keyword</Text>
-            <TextInput
-              style={styles.modalInput}
-              placeholder="e.g. newborn photography tips"
-              placeholderTextColor={colors.textLight}
-              value={newKeyword}
-              onChangeText={setNewKeyword}
-              autoFocus
-            />
-            <Text style={styles.modalLabel}>Category</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.md }}>
-              {(Object.keys(categoryLabels) as KeywordCategory[]).map(cat => (
-                <TouchableOpacity
-                  key={cat}
-                  style={[
-                    styles.catChip,
-                    newCategory === cat && { backgroundColor: categoryColors[cat] }
-                  ]}
-                  onPress={() => setNewCategory(cat)}
-                >
-                  <Text style={[styles.catChipText, newCategory === cat && { color: colors.white }]}>
-                    {categoryLabels[cat]}
-                  </Text>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalSheet}>
+              <Text style={styles.modalTitle}>Add Keyword</Text>
+              <Text style={styles.modalHint}>Add any keyword you want to rank for on Google.</Text>
+
+              <Text style={styles.modalLabel}>Keyword</Text>
+              <TextInput
+                style={styles.modalInput}
+                placeholder="e.g. wedding photographer Dallas"
+                placeholderTextColor={colors.textLight}
+                value={newKeyword}
+                onChangeText={setNewKeyword}
+                autoFocus
+              />
+
+              <Text style={styles.modalLabel}>Current Google rank (optional)</Text>
+              <TextInput
+                style={styles.modalInput}
+                placeholder="e.g. 7  (leave blank if unknown)"
+                placeholderTextColor={colors.textLight}
+                value={newRank}
+                onChangeText={setNewRank}
+                keyboardType="number-pad"
+              />
+              <Text style={styles.rankHint}>
+                Rank = the position your site appears on Google. #1 is the best.
+              </Text>
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => { setShowAddModal(false); setNewKeyword(''); setNewRank(''); }}>
+                  <Text style={styles.cancelBtnText}>Cancel</Text>
                 </TouchableOpacity>
-              ))}
-            </ScrollView>
-            <Text style={styles.modalLabel}>Status</Text>
-            <View style={styles.statusOptions}>
-              {STATUS_OPTIONS.map(s => (
                 <TouchableOpacity
-                  key={s}
-                  style={[
-                    styles.statusOption,
-                    newStatus === s && { backgroundColor: getStatusColor(s) }
-                  ]}
-                  onPress={() => setNewStatus(s)}
+                  style={[styles.saveBtn, !newKeyword.trim() && styles.saveBtnDisabled]}
+                  onPress={handleAdd}
+                  disabled={!newKeyword.trim()}
                 >
-                  <Text style={[styles.statusOptionText, newStatus === s && { color: colors.white }]}>
-                    {getStatusLabel(s)}
-                  </Text>
+                  <Text style={styles.saveBtnText}>Add Keyword</Text>
                 </TouchableOpacity>
-              ))}
-            </View>
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowAddModal(false)}>
-                <Text style={styles.cancelBtnText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.saveBtn} onPress={handleAdd}>
-                <Text style={styles.saveBtnText}>Add Keyword</Text>
-              </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
-      {/* Edit Modal */}
-      <Modal visible={showEditModal} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalSheet}>
-            <Text style={styles.modalTitle}>{editTarget?.keyword}</Text>
-            <Text style={styles.modalLabel}>Update Status</Text>
-            <View style={styles.statusOptions}>
-              {STATUS_OPTIONS.map(s => (
+      {/* Log Rank Modal */}
+      <Modal visible={showRankModal} transparent animationType="slide">
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalSheet}>
+              <Text style={styles.modalTitle}>Log Rank</Text>
+              <Text style={styles.modalKeywordName}>"{rankTarget?.keyword}"</Text>
+
+              <View style={styles.googleHint}>
+                <Ionicons name="information-circle" size={15} color={colors.primary} />
+                <Text style={styles.googleHintText}>
+                  Search Google for this keyword, find where your website appears, then enter that position below.
+                </Text>
+              </View>
+
+              {rankTarget && (
                 <TouchableOpacity
-                  key={s}
-                  style={[
-                    styles.statusOption,
-                    newStatus === s && { backgroundColor: getStatusColor(s) }
-                  ]}
-                  onPress={() => setNewStatus(s)}
+                  style={styles.googleBtn}
+                  onPress={() => Linking.openURL(buildGoogleSearchUrl(rankTarget.keyword, websiteUrl))}
                 >
-                  <Text style={[styles.statusOptionText, newStatus === s && { color: colors.white }]}>
-                    {getStatusLabel(s)}
-                  </Text>
+                  <Ionicons name="search" size={16} color={colors.white} />
+                  <Text style={styles.googleBtnText}>Search Google now</Text>
                 </TouchableOpacity>
-              ))}
-            </View>
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowEditModal(false)}>
-                <Text style={styles.cancelBtnText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.saveBtn} onPress={handleEditSave}>
-                <Text style={styles.saveBtnText}>Save</Text>
-              </TouchableOpacity>
+              )}
+
+              <Text style={styles.modalLabel}>Your rank position</Text>
+              <TextInput
+                style={styles.modalInput}
+                placeholder="e.g. 5"
+                placeholderTextColor={colors.textLight}
+                value={rankInput}
+                onChangeText={setRankInput}
+                keyboardType="number-pad"
+                autoFocus
+              />
+
+              {rankTarget?.currentRank !== undefined && (
+                <Text style={styles.prevRank}>Previous rank: #{rankTarget.currentRank}</Text>
+              )}
+
+              <View style={styles.rankKey}>
+                <Text style={styles.rankKeyItem}><Text style={{ color: '#5B8A5B', fontWeight: '700' }}>#1–10</Text> = Ranking (page 1)</Text>
+                <Text style={styles.rankKeyItem}><Text style={{ color: '#E8B84B', fontWeight: '700' }}>#11–20</Text> = Improving (page 2)</Text>
+                <Text style={styles.rankKeyItem}><Text style={{ color: '#D44533', fontWeight: '700' }}>#21+</Text> = Needs work</Text>
+              </View>
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowRankModal(false)}>
+                  <Text style={styles.cancelBtnText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.saveBtn, !rankInput.trim() && styles.saveBtnDisabled]}
+                  onPress={handleSaveRank}
+                  disabled={!rankInput.trim()}
+                >
+                  <Text style={styles.saveBtnText}>Save Rank</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   );
@@ -366,11 +405,7 @@ const styles = StyleSheet.create({
   },
   searchInput: { flex: 1, paddingVertical: spacing.sm, ...typography.body, color: colors.textDark },
   filterScroll: { maxHeight: 48 },
-  filterContent: {
-    paddingHorizontal: spacing.md,
-    gap: spacing.sm,
-    alignItems: 'center',
-  },
+  filterContent: { paddingHorizontal: spacing.md, gap: spacing.sm, alignItems: 'center' },
   filterTab: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs + 2,
@@ -396,49 +431,34 @@ const styles = StyleSheet.create({
   },
   statusBar: { width: 4 },
   keywordBody: { flex: 1, padding: spacing.md, gap: spacing.xs },
-  keywordTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  keywordText: { ...typography.body, fontWeight: '600', color: colors.textDark, flex: 1, marginRight: spacing.sm },
+  keywordTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: spacing.sm },
+  keywordText: { ...typography.body, fontWeight: '600', color: colors.textDark, flex: 1 },
+  rankArea: { alignItems: 'flex-end', gap: 2 },
+  rankNumber: { fontSize: 22, fontWeight: '800', lineHeight: 26 },
+  noRank: { ...typography.bodySmall, color: colors.textLight, fontStyle: 'italic' },
+  trendUp: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  trendUpText: { fontSize: 11, fontWeight: '700', color: '#5B8A5B' },
+  trendDown: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  trendDownText: { fontSize: 11, fontWeight: '700', color: '#D44533' },
+  trendSame: { fontSize: 11, color: colors.textLight },
+  statusRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   statusBadge: { paddingHorizontal: spacing.sm, paddingVertical: 2, borderRadius: radius.full },
   statusBadgeText: { fontSize: 11, fontWeight: '600' },
-  categoryText: { ...typography.bodySmall, textTransform: 'capitalize' },
-  keywordActions: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.xs },
+  historyNote: { ...typography.bodySmall, color: colors.textLight },
+  keywordActions: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.xs, flexWrap: 'wrap' },
   actionBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   actionBtnText: { ...typography.bodySmall, color: colors.textMedium },
   empty: { alignItems: 'center', paddingVertical: spacing.xl, gap: spacing.sm },
   emptyText: { ...typography.body, color: colors.textLight, textAlign: 'center', maxWidth: 280 },
-  suggestionsSection: {
-    marginTop: spacing.lg,
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: colors.border,
+  emptyAddBtn: {
+    marginTop: spacing.sm,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.full,
   },
-  suggestionsToggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: spacing.md,
-  },
-  suggestionsToggleText: { ...typography.body, fontWeight: '600', color: colors.primary },
-  suggestionsList: { borderTopWidth: 1, borderTopColor: colors.border },
-  suggestionItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  suggestionKeyword: { ...typography.body, fontWeight: '500', color: colors.textDark },
-  suggestionDesc: { ...typography.bodySmall, marginTop: 2 },
-  categoryPill: { paddingHorizontal: spacing.sm, paddingVertical: 2, borderRadius: radius.full },
-  categoryPillText: { fontSize: 11, fontWeight: '600' },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'flex-end',
-  },
+  emptyAddBtnText: { color: colors.white, fontWeight: '600', fontSize: 15 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   modalSheet: {
     backgroundColor: colors.surface,
     borderTopLeftRadius: radius.xl,
@@ -447,7 +467,9 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
     gap: spacing.sm,
   },
-  modalTitle: { ...typography.h3, marginBottom: spacing.xs },
+  modalTitle: { ...typography.h3 },
+  modalHint: { ...typography.bodySmall, color: colors.textLight, marginBottom: spacing.xs },
+  modalLabel: { ...typography.label, marginTop: spacing.xs },
   modalInput: {
     borderWidth: 1,
     borderColor: colors.border,
@@ -455,26 +477,36 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     ...typography.body,
     color: colors.textDark,
-    marginBottom: spacing.sm,
   },
-  modalLabel: { ...typography.label, marginBottom: spacing.xs },
-  catChip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: radius.full,
-    backgroundColor: colors.border,
-    marginRight: spacing.sm,
+  rankHint: { ...typography.bodySmall, color: colors.textLight, marginTop: -spacing.xs },
+  modalKeywordName: { ...typography.body, fontWeight: '600', color: colors.textDark, marginBottom: spacing.xs },
+  googleHint: {
+    flexDirection: 'row',
+    gap: spacing.xs,
+    backgroundColor: colors.primaryLight,
+    borderRadius: radius.sm,
+    padding: spacing.sm,
+    alignItems: 'flex-start',
   },
-  catChipText: { ...typography.bodySmall, fontWeight: '500', color: colors.textMedium },
-  statusOptions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },
-  statusOption: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs + 2,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: colors.border,
+  googleHintText: { ...typography.bodySmall, flex: 1, lineHeight: 18, color: colors.textMedium },
+  googleBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    backgroundColor: colors.primary,
+    borderRadius: radius.md,
+    padding: spacing.sm,
   },
-  statusOptionText: { ...typography.bodySmall, fontWeight: '500', color: colors.textMedium },
+  googleBtnText: { color: colors.white, fontWeight: '600', fontSize: 14 },
+  prevRank: { ...typography.bodySmall, color: colors.textLight },
+  rankKey: {
+    backgroundColor: colors.background,
+    borderRadius: radius.sm,
+    padding: spacing.sm,
+    gap: 4,
+  },
+  rankKeyItem: { ...typography.bodySmall, lineHeight: 18 },
   modalActions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm },
   cancelBtn: {
     flex: 1,
@@ -485,12 +517,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelBtnText: { ...typography.body, fontWeight: '600', color: colors.textMedium },
-  saveBtn: {
-    flex: 1,
-    padding: spacing.md,
-    borderRadius: radius.md,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-  },
+  saveBtn: { flex: 1, padding: spacing.md, borderRadius: radius.md, backgroundColor: colors.primary, alignItems: 'center' },
+  saveBtnDisabled: { opacity: 0.4 },
   saveBtnText: { ...typography.body, fontWeight: '600', color: colors.white },
 });

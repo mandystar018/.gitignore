@@ -63,12 +63,18 @@ export type KeywordCategory =
   | 'business'
   | 'custom';
 
+export interface RankEntry {
+  date: string;
+  rank: number;
+}
+
 export interface TrackedKeyword {
   id: string;
   keyword: string;
   category: KeywordCategory;
   status: KeywordStatus;
-  rank?: number;
+  currentRank?: number;
+  rankHistory: RankEntry[];
   notes: string;
   dateAdded: string;
   lastUpdated: string;
