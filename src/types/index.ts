@@ -55,3 +55,10 @@ export type RootStackParamList = {
   Activities: { answers: QuizAnswers };
   ActivityDetail: { activity: Activity };
 };
+
+export type DivorceStackParamList = {
+  DivorceHome: undefined;
+  DivorcePhase: { phaseId: string };
+  DivorceStep: { phaseId: string; stepId: string };
+  DivorceTimeline: undefined;
+};

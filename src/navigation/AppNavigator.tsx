@@ -1,29 +1,25 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { RootStackParamList } from '../types';
-import WelcomeScreen from '../screens/WelcomeScreen';
-import QuizScreen from '../screens/QuizScreen';
-import ActivitiesScreen from '../screens/ActivitiesScreen';
-import ActivityDetailScreen from '../screens/ActivityDetailScreen';
+import { DivorceStackParamList } from '../types';
+import DivorceHomeScreen from '../screens/DivorceHomeScreen';
+import DivorcePhaseScreen from '../screens/DivorcePhaseScreen';
+import DivorceStepScreen from '../screens/DivorceStepScreen';
+import DivorceTimelineScreen from '../screens/DivorceTimelineScreen';
 
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack = createStackNavigator<DivorceStackParamList>();
 
 export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Welcome"
+        initialRouteName="DivorceHome"
         screenOptions={{ headerShown: false }}
       >
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
-        <Stack.Screen name="Quiz" component={QuizScreen} />
-        <Stack.Screen
-          name="Activities"
-          component={ActivitiesScreen}
-          options={{ gestureEnabled: false }}
-        />
-        <Stack.Screen name="ActivityDetail" component={ActivityDetailScreen} />
+        <Stack.Screen name="DivorceHome" component={DivorceHomeScreen} />
+        <Stack.Screen name="DivorcePhase" component={DivorcePhaseScreen} />
+        <Stack.Screen name="DivorceStep" component={DivorceStepScreen} />
+        <Stack.Screen name="DivorceTimeline" component={DivorceTimelineScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
